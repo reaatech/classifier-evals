@@ -1,0 +1,71 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Development
+.nvmrc
+.husky/
+
+# Tests
+tests/
+src/**/*.test.ts
+src/**/*.spec.ts
+*.test.ts
+*.spec.ts
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Build
+dist/
+coverage/
+.nyc_output/
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Docker
+docker-compose.override.yml
+Dockerfile
+.dockerignore
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfvars
+infra/
+
+# Reports and datasets (generated during evaluation)
+reports/
+datasets/*.csv
+datasets/*.json
+datasets/*.jsonl
+datasets/*.parquet
+!datasets/examples/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary
+tmp/
+temp/
+.cache/
