@@ -1,0 +1,77 @@
+# Example Evaluation Configuration
+# This file demonstrates how to configure a complete evaluation pipeline
+
+# Dataset configuration
+dataset:
+  path: "datasets/test-set.csv"  # Path to your evaluation dataset
+  format: "csv"                   # csv, json, jsonl, or parquet
+  text_column: "text"
+  label_column: "label"
+  predicted_label_column: "predicted_label"
+  confidence_column: "confidence"
+
+# Metrics to calculate
+metrics:
+  - accuracy
+  - precision
+  - recall
+  - f1_macro
+  - f1_micro
+  - f1_weighted
+  - confusion_matrix
+  - per_class_metrics
+
+# LLM-as-Judge configuration (optional)
+judge:
+  enabled: false  # Set to true to enable LLM judging
+  model: "claude-opus"
+  prompt_template: "classification-eval"
+  consensus_count: 1
+  max_cost_per_sample: 0.05
+  budget_limit: 50.00
+  retry_count: 3
+  timeout_ms: 30000
+
+# Regression gates for CI
+gates:
+  - name: "overall-accuracy"
+    type: "threshold"
+    metric: "accuracy"
+    operator: ">="
+    threshold: 0.85
+
+  - name: "macro-f1"
+    type: "threshold"
+    metric: "f1_macro"
+    operator: ">="
+    threshold: 0.80
+
+  - name: "no-regression"
+    type: "baseline-comparison"
+    baseline_path: "results/baseline.json"
+    metric: "f1_per_class"
+    allow_regression_in: 0
+
+# Export configuration
+export:
+  json:
+    enabled: true
+    path: "results/eval-results.json"
+  html:
+    enabled: true
+    path: "reports/eval-report.html"
+    include_confusion_matrix: true
+    include_per_class_metrics: true
+  phoenix:
+    enabled: false
+    endpoint: "http://localhost:6006"
+    dataset_name: "intent-classifier-eval"
+  langfuse:
+    enabled: false
+    project_name: "classifier-evals"
+    session_name: "evaluation-run"
+
+# Observability
+observability:
+  log_level: "info"
+  otel_endpoint: ""  # Set to enable OpenTelemetry export

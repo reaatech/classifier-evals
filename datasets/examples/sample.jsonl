@@ -1,0 +1,15 @@
+{"text": "Reset my password", "label": "password_reset", "predicted_label": "password_reset", "confidence": 0.95}
+{"text": "Cancel my subscription", "label": "cancel_subscription", "predicted_label": "refund_request", "confidence": 0.72}
+{"text": "Where is my order", "label": "order_status", "predicted_label": "order_status", "confidence": 0.88}
+{"text": "I want to change my email", "label": "update_email", "predicted_label": "update_email", "confidence": 0.91}
+{"text": "Your service is terrible", "label": "complaint", "predicted_label": "complaint", "confidence": 0.85}
+{"text": "How do I upgrade my plan", "label": "upgrade_request", "predicted_label": "upgrade_request", "confidence": 0.93}
+{"text": "My payment failed", "label": "payment_issue", "predicted_label": "payment_issue", "confidence": 0.89}
+{"text": "I need a refund", "label": "refund_request", "predicted_label": "refund_request", "confidence": 0.94}
+{"text": "Can you help me login", "label": "login_help", "predicted_label": "login_help", "confidence": 0.87}
+{"text": "I want to delete my account", "label": "delete_account", "predicted_label": "delete_account", "confidence": 0.96}
+{"text": "My app keeps crashing", "label": "technical_issue", "predicted_label": "technical_issue", "confidence": 0.82}
+{"text": "How much does premium cost", "label": "pricing_inquiry", "predicted_label": "pricing_inquiry", "confidence": 0.90}
+{"text": "I forgot my username", "label": "login_help", "predicted_label": "password_reset", "confidence": 0.68}
+{"text": "Is there a mobile app", "label": "general_inquiry", "predicted_label": "general_inquiry", "confidence": 0.78}
+{"text": "Can I pause my subscription", "label": "cancel_subscription", "predicted_label": "pause_subscription", "confidence": 0.65}

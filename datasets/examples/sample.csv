@@ -1,0 +1,16 @@
+text,label,predicted_label,confidence
+"Reset my password",password_reset,password_reset,0.95
+"Cancel my subscription",cancel_subscription,refund_request,0.72
+"Where is my order",order_status,order_status,0.88
+"I want to change my email",update_email,update_email,0.91
+"Your service is terrible",complaint,complaint,0.85
+"How do I upgrade my plan",upgrade_request,upgrade_request,0.93
+"My payment failed",payment_issue,payment_issue,0.89
+"I need a refund",refund_request,refund_request,0.94
+"Can you help me login",login_help,login_help,0.87
+"I want to delete my account",delete_account,delete_account,0.96
+"My app keeps crashing",technical_issue,technical_issue,0.82
+"How much does premium cost",pricing_inquiry,pricing_inquiry,0.90
+"I forgot my username",login_help,password_reset,0.68
+"Is there a mobile app",general_inquiry,general_inquiry,0.78
+"Can I pause my subscription",cancel_subscription,pause_subscription,0.65
