@@ -1,0 +1,35 @@
+# Example regression gate configuration for classifier-evals
+# Use with: classifier-evals gates --results results.json --gates gates.yaml
+
+gates:
+  # Overall accuracy threshold
+  - name: overall-accuracy
+    type: threshold
+    metric: accuracy
+    operator: ">="
+    threshold: 0.80
+    description: "Overall accuracy must be at least 80%"
+
+  # Macro F1 threshold
+  - name: macro-f1
+    type: threshold
+    metric: f1_macro
+    operator: ">="
+    threshold: 0.75
+    description: "Macro F1 score must be at least 75%"
+
+  # Per-class F1 thresholds
+  - name: min-class-f1
+    type: threshold
+    metric: f1_per_class
+    operator: ">="
+    threshold: 0.60
+    description: "Each class must have F1 score of at least 60%"
+
+  # Baseline comparison gate
+  - name: no-regression
+    type: baseline-comparison
+    baseline_path: results/baseline.json
+    metric: f1_macro
+    allow_regression_in: 0
+    description: "No regression in macro F1 compared to baseline"
