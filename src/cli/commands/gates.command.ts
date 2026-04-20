@@ -70,7 +70,7 @@ export function gatesCommand(program: Command): void {
  */
 function formatGateResults(result: GateEvaluationResult): string {
   const lines: string[] = [];
-  
+
   const status = result.passed ? '✅ PASSED' : '❌ FAILED';
   lines.push(`\nGate Evaluation: ${status}`);
   lines.push(`Passed: ${result.passedCount}/${result.totalCount}`);

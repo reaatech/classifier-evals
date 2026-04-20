@@ -31,7 +31,7 @@ function createMinimalEvalRun(overrides?: Partial<EvalRun>): EvalRun {
       precision_weighted: 0.84,
       recall_weighted: 0.85,
       f1_weighted: 0.84,
-      matthews_correlation: 0.70,
+      matthews_correlation: 0.7,
       cohens_kappa: 0.68,
       total_samples: 100,
       correct_predictions: 85,
@@ -50,7 +50,7 @@ function createMinimalEvalRun(overrides?: Partial<EvalRun>): EvalRun {
           false_negatives: 10,
           true_negatives: 45,
           precision: 0.89,
-          recall: 0.80,
+          recall: 0.8,
           f1: 0.84,
           support: 50,
         },
@@ -61,7 +61,7 @@ function createMinimalEvalRun(overrides?: Partial<EvalRun>): EvalRun {
           false_negatives: 5,
           true_negatives: 40,
           precision: 0.82,
-          recall: 0.90,
+          recall: 0.9,
           f1: 0.86,
           support: 50,
         },
@@ -107,9 +107,7 @@ describe('Exporters', () => {
 
     it('includes judge summary when judged_results present', () => {
       const evalRun = createMinimalEvalRun({
-        judged_results: [
-          { text: 'sample', label: 'a', predicted_label: 'a', confidence: 0.9 },
-        ],
+        judged_results: [{ text: 'sample', label: 'a', predicted_label: 'a', confidence: 0.9 }],
         judge_cost: 0.05,
         metadata: {
           distribution_metrics: {
@@ -191,9 +189,7 @@ describe('Exporters', () => {
             },
           ],
         },
-        gate_results: [
-          { name: 'gate<1>', passed: false, message: 'bad <b>message</b>' },
-        ],
+        gate_results: [{ name: 'gate<1>', passed: false, message: 'bad <b>message</b>' }],
         judged_results: [
           {
             text: 'sample',
@@ -313,7 +309,9 @@ describe('Exporters', () => {
     it('returns failure on error', async () => {
       const evalRun = createMinimalEvalRun();
       Object.defineProperty(evalRun, 'metrics', {
-        get() { throw new Error('boom'); },
+        get() {
+          throw new Error('boom');
+        },
         configurable: true,
       });
       const input: LangfuseExportInput = {
@@ -332,7 +330,10 @@ describe('Exporters', () => {
         options: { publicKey: 'pk', secretKey: 'sk' },
       };
 
-      const mockResponse = new Response('error details', { status: 500, statusText: 'Internal Server Error' });
+      const mockResponse = new Response('error details', {
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
       const mockFetch = vi.fn().mockResolvedValue(mockResponse);
       const originalFetch = global.fetch;
       global.fetch = mockFetch;
@@ -353,7 +354,9 @@ describe('Exporters', () => {
       };
 
       const mockResponse = new Response(null, { status: 403, statusText: 'Forbidden' });
-      Object.defineProperty(mockResponse, 'text', { value: () => Promise.reject(new Error('cannot read')) });
+      Object.defineProperty(mockResponse, 'text', {
+        value: () => Promise.reject(new Error('cannot read')),
+      });
       const mockFetch = vi.fn().mockResolvedValue(mockResponse);
       const originalFetch = global.fetch;
       global.fetch = mockFetch;
@@ -402,7 +405,9 @@ describe('Exporters', () => {
     it('returns failure on error', async () => {
       const evalRun = createMinimalEvalRun();
       Object.defineProperty(evalRun, 'confusion_matrix', {
-        get() { throw new Error('phoenix-boom'); },
+        get() {
+          throw new Error('phoenix-boom');
+        },
         configurable: true,
       });
       const input: PhoenixExportInput = { evalRun };
@@ -416,7 +421,9 @@ describe('Exporters', () => {
     it('returns failure on error', () => {
       const evalRun = createMinimalEvalRun();
       Object.defineProperty(evalRun, 'confusion_matrix', {
-        get() { throw new Error('html-boom'); },
+        get() {
+          throw new Error('html-boom');
+        },
         configurable: true,
       });
       const result = exportToHtml(evalRun);
@@ -430,7 +437,9 @@ describe('Exporters', () => {
     it('returns failure on error', () => {
       const evalRun = createMinimalEvalRun();
       Object.defineProperty(evalRun, 'metrics', {
-        get() { throw new Error('json-boom'); },
+        get() {
+          throw new Error('json-boom');
+        },
         configurable: true,
       });
       const input: JsonExportInput = { evalRun };

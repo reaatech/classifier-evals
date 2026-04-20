@@ -42,7 +42,7 @@ async function sendToPhoenix(
   endpoint: string,
   apiKey: string | undefined,
   datasetName: string,
-  traces: PhoenixTrace[]
+  traces: PhoenixTrace[],
 ): Promise<void> {
   const url = `${endpoint}/api/traces`;
   const headers: Record<string, string> = {
@@ -69,7 +69,9 @@ async function sendToPhoenix(
 
     if (!response.ok) {
       const body = await response.text().catch(() => '');
-      throw new Error(`Phoenix API error: ${response.status} ${response.statusText}${body !== '' ? ` - ${body}` : ''}`);
+      throw new Error(
+        `Phoenix API error: ${response.status} ${response.statusText}${body !== '' ? ` - ${body}` : ''}`,
+      );
     }
   } finally {
     clearTimeout(timeout);
@@ -142,7 +144,7 @@ export async function exportToPhoenix(input: PhoenixExportInput): Promise<Export
         endpoint,
         datasetName,
       },
-      'Phoenix export completed'
+      'Phoenix export completed',
     );
 
     return {
@@ -158,7 +160,7 @@ export async function exportToPhoenix(input: PhoenixExportInput): Promise<Export
         runId: evalRun.run_id,
         error: err.message,
       },
-      'Phoenix export failed'
+      'Phoenix export failed',
     );
 
     return {

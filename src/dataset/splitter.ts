@@ -35,7 +35,7 @@ export interface SplitResult {
 function createRng(seed: number): () => number {
   return function () {
     seed |= 0;
-    seed = (seed + 0x6D2B79F5) | 0;
+    seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -63,12 +63,13 @@ function splitSamples(
   samples: ClassificationResult[],
   testSize: number,
   stratify: boolean,
-  rng: () => number
+  rng: () => number,
 ): SplitResult {
   // Determine actual test size
-  const numTest = testSize < 1
-    ? Math.round(samples.length * testSize)
-    : Math.min(Math.round(testSize), samples.length - 1);
+  const numTest =
+    testSize < 1
+      ? Math.round(samples.length * testSize)
+      : Math.min(Math.round(testSize), samples.length - 1);
 
   const numTrain = samples.length - numTest;
 
@@ -97,7 +98,7 @@ function splitSamples(
   for (const [, labelSamples] of byLabel.entries()) {
     const shuffled = shuffleArray(labelSamples, rng);
     const labelTestSize = Math.round(shuffled.length * testSize);
-    
+
     train.push(...shuffled.slice(0, shuffled.length - labelTestSize));
     test.push(...shuffled.slice(shuffled.length - labelTestSize));
   }
@@ -116,14 +117,14 @@ function splitSamples(
 
 /**
  * Split a dataset into train and test sets
- * 
+ *
  * @param dataset - The dataset to split
  * @param options - Split options
  * @returns Train and test datasets
  */
 export function splitDataset(
   dataset: EvalDataset,
-  options: SplitOptions
+  options: SplitOptions,
 ): { train: EvalDataset; test: EvalDataset } {
   const seed = options.seed ?? 42;
   const rng = createRng(seed);
@@ -186,22 +187,20 @@ export function splitDataset(
 
 /**
  * K-fold cross-validation split
- * 
+ *
  * @param dataset - The dataset to split
  * @param k - Number of folds (default: 5)
  * @param seed - Random seed for reproducibility
  * @returns Array of k folds
  */
-export function kFoldSplit(
-  dataset: EvalDataset,
-  k: number = 5,
-  seed: number = 42
-): EvalDataset[] {
+export function kFoldSplit(dataset: EvalDataset, k: number = 5, seed: number = 42): EvalDataset[] {
   if (k < 2) {
     throw new Error('k must be at least 2');
   }
   if (k > dataset.samples.length) {
-    throw new Error(`k (${k}) cannot be greater than number of samples (${dataset.samples.length})`);
+    throw new Error(
+      `k (${k}) cannot be greater than number of samples (${dataset.samples.length})`,
+    );
   }
 
   const rng = createRng(seed);
@@ -240,7 +239,7 @@ export function kFoldSplit(
 
 /**
  * Generate train/test splits for each fold in K-fold cross-validation
- * 
+ *
  * @param dataset - The dataset to split
  * @param k - Number of folds (default: 5)
  * @param seed - Random seed for reproducibility
@@ -249,7 +248,7 @@ export function kFoldSplit(
 export function kFoldSplits(
   dataset: EvalDataset,
   k: number = 5,
-  seed: number = 42
+  seed: number = 42,
 ): { train: EvalDataset; test: EvalDataset }[] {
   const folds = kFoldSplit(dataset, k, seed);
   const splits: { train: EvalDataset; test: EvalDataset }[] = [];
@@ -257,9 +256,9 @@ export function kFoldSplits(
   for (let i = 0; i < k; i++) {
     const testFold = folds[i]!;
     const trainFolds = folds.filter((_, j) => j !== i);
-    
+
     // Combine all train folds - trainFolds is EvalDataset[], so we just need to flatten once
-    const trainSamples = trainFolds.flatMap(f => f.samples!);
+    const trainSamples = trainFolds.flatMap((f) => f.samples!);
     const trainLabels = new Set<string>();
     const trainLabelDist: Record<string, number> = {};
     for (const sample of trainSamples) {

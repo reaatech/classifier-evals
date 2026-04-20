@@ -28,9 +28,7 @@ export interface EvalRunBuildOptions {
   metadata?: Record<string, unknown>;
 }
 
-function buildDistributionMetadata(
-  samples: ClassificationResult[]
-): Record<string, unknown> {
+function buildDistributionMetadata(samples: ClassificationResult[]): Record<string, unknown> {
   const labelDistribution: Record<string, number> = {};
   const predictionDistribution: Record<string, number> = {};
 
@@ -42,8 +40,7 @@ function buildDistributionMetadata(
 
   const totalSamples = samples.length || 1;
   const unknownCount =
-    (predictionDistribution.unknown ?? 0) +
-    (predictionDistribution.UNKNOWN ?? 0);
+    (predictionDistribution.unknown ?? 0) + (predictionDistribution.UNKNOWN ?? 0);
 
   return {
     label_distribution: labelDistribution,
@@ -56,9 +53,7 @@ function buildDistributionMetadata(
   };
 }
 
-export function createEvalRunFromSamples(
-  options: EvalRunBuildOptions
-): EvalRun {
+export function createEvalRunFromSamples(options: EvalRunBuildOptions): EvalRun {
   const startedAt = options.startedAt ?? new Date();
   const completedAt = options.completedAt ?? new Date();
   const confusionMatrix = buildConfusionMatrix(options.samples);
@@ -105,9 +100,7 @@ export function loadEvalRunFromFile(filePath: string): EvalRun {
   }
 }
 
-export function normalizeRegressionGate(
-  gate: Record<string, unknown>
-): RegressionGate {
+export function normalizeRegressionGate(gate: Record<string, unknown>): RegressionGate {
   return {
     name: String(gate.name ?? 'unnamed-gate'),
     type: gate.type as RegressionGate['type'],
@@ -128,11 +121,8 @@ export function normalizeRegressionGate(
           ? gate.baseline
           : undefined,
     allow_regression_in:
-      typeof gate.allow_regression_in === 'number'
-        ? gate.allow_regression_in
-        : undefined,
-    description:
-      typeof gate.description === 'string' ? gate.description : undefined,
+      typeof gate.allow_regression_in === 'number' ? gate.allow_regression_in : undefined,
+    description: typeof gate.description === 'string' ? gate.description : undefined,
   };
 }
 

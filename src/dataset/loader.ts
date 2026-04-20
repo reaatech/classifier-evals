@@ -129,11 +129,10 @@ function parseCSV(content: string): ClassificationResult[] {
     const label = parseCSVField(values[labelIdx!] ?? '');
     const predictedLabel = parseCSVField(values[predictedLabelIdx!] ?? '');
     const confidenceValue = confidenceIdx >= 0 ? values[confidenceIdx!] : undefined;
-    const confidenceStr = confidenceValue !== undefined ? parseCSVField(confidenceValue) : undefined;
+    const confidenceStr =
+      confidenceValue !== undefined ? parseCSVField(confidenceValue) : undefined;
     const confidence =
-      confidenceStr !== undefined && confidenceStr !== ''
-        ? parseFloat(confidenceStr)
-        : 1.0;
+      confidenceStr !== undefined && confidenceStr !== '' ? parseFloat(confidenceStr) : 1.0;
 
     if (!text || !label || !predictedLabel) {
       continue;
@@ -155,9 +154,9 @@ function parseCSV(content: string): ClassificationResult[] {
  */
 function parseJSON(content: string): ClassificationResult[] {
   const parsed = JSON.parse(content);
-  
+
   let items: Record<string, unknown>[];
-  
+
   if (Array.isArray(parsed)) {
     items = parsed;
   } else if (typeof parsed === 'object' && parsed !== null) {
@@ -177,15 +176,14 @@ function parseJSON(content: string): ClassificationResult[] {
   }
 
   return items
-    .filter(item => typeof item === 'object' && item !== null)
-    .map(item => {
+    .filter((item) => typeof item === 'object' && item !== null)
+    .map((item) => {
       const obj = item as Record<string, unknown>;
       const text = typeof obj.text === 'string' ? obj.text : '';
       const label = typeof obj.label === 'string' ? obj.label : '';
       const predictedLabel = typeof obj.predicted_label === 'string' ? obj.predicted_label : '';
-      const confidence = typeof obj.confidence === 'number' 
-        ? Math.max(0, Math.min(1, obj.confidence)) 
-        : 1.0;
+      const confidence =
+        typeof obj.confidence === 'number' ? Math.max(0, Math.min(1, obj.confidence)) : 1.0;
 
       if (!text || !label || !predictedLabel) {
         return null;
@@ -219,9 +217,8 @@ function parseJSONL(content: string): ClassificationResult[] {
       const text = typeof obj.text === 'string' ? obj.text : '';
       const label = typeof obj.label === 'string' ? obj.label : '';
       const predictedLabel = typeof obj.predicted_label === 'string' ? obj.predicted_label : '';
-      const confidence = typeof obj.confidence === 'number' 
-        ? Math.max(0, Math.min(1, obj.confidence)) 
-        : 1.0;
+      const confidence =
+        typeof obj.confidence === 'number' ? Math.max(0, Math.min(1, obj.confidence)) : 1.0;
 
       if (!text || !label || !predictedLabel) {
         continue;
@@ -248,7 +245,7 @@ function parseJSONL(content: string): ClassificationResult[] {
 function computeMetadata(
   samples: ClassificationResult[],
   format: 'csv' | 'json' | 'jsonl',
-  filePath?: string
+  filePath?: string,
 ): DatasetMetadata {
   const labels = new Set<string>();
   const labelDistribution: Record<string, number> = {};
@@ -275,14 +272,14 @@ function computeMetadata(
 
 /**
  * Load a dataset from file
- * 
+ *
  * @param filePath - Path to the dataset file
  * @param format - Optional format override (auto-detected if not provided)
  * @returns Promise resolving to EvalDataset
  */
 export async function loadDataset(
   filePath: string,
-  format?: 'csv' | 'json' | 'jsonl'
+  format?: 'csv' | 'json' | 'jsonl',
 ): Promise<EvalDataset> {
   // Detect or validate format
   const detectedFormat = format ?? detectFormat(filePath);
@@ -314,7 +311,7 @@ export async function loadDataset(
   }
 
   // Validate each sample
-  const validatedSamples = samples.map(sample => {
+  const validatedSamples = samples.map((sample) => {
     const result = ClassificationResultSchema.safeParse(sample);
     if (!result.success) {
       throw new Error(`Invalid sample: ${result.error.message}`);
@@ -332,14 +329,14 @@ export async function loadDataset(
 
 /**
  * Load dataset from raw content string
- * 
+ *
  * @param content - Raw file content
  * @param format - Format of the content
  * @returns Promise resolving to EvalDataset
  */
 export async function loadDatasetFromContent(
   content: string,
-  format: 'csv' | 'json' | 'jsonl'
+  format: 'csv' | 'json' | 'jsonl',
 ): Promise<EvalDataset> {
   let samples: ClassificationResult[];
 
@@ -362,7 +359,7 @@ export async function loadDatasetFromContent(
     throw new Error('No valid samples found in dataset');
   }
 
-  const validatedSamples = samples.map(sample => {
+  const validatedSamples = samples.map((sample) => {
     const result = ClassificationResultSchema.safeParse(sample);
     if (!result.success) {
       throw new Error(`Invalid sample: ${result.error.message}`);

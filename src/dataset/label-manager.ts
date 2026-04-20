@@ -59,10 +59,7 @@ export function normalizeLabel(label: string, options: NormalizationOptions = {}
 /**
  * Apply label aliases to a classification result
  */
-function applyAliases(
-  sample: ClassificationResult,
-  aliases: LabelAliases
-): ClassificationResult {
+function applyAliases(sample: ClassificationResult, aliases: LabelAliases): ClassificationResult {
   const applyAlias = (label: string): string => {
     const normalized = normalizeLabel(label);
     return aliases[normalized] ?? label;
@@ -78,11 +75,8 @@ function applyAliases(
 /**
  * Apply label aliases to a dataset
  */
-export function applyLabelAliases(
-  dataset: EvalDataset,
-  aliases: LabelAliases
-): EvalDataset {
-  const newSamples = dataset.samples.map(s => applyAliases(s, aliases));
+export function applyLabelAliases(dataset: EvalDataset, aliases: LabelAliases): EvalDataset {
+  const newSamples = dataset.samples.map((s) => applyAliases(s, aliases));
 
   // Recompute metadata
   const labels = new Set<string>();
@@ -107,9 +101,9 @@ export function applyLabelAliases(
  */
 export function normalizeLabels(
   dataset: EvalDataset,
-  options: NormalizationOptions = {}
+  options: NormalizationOptions = {},
 ): EvalDataset {
-  const newSamples = dataset.samples.map(sample => ({
+  const newSamples = dataset.samples.map((sample) => ({
     ...sample,
     label: normalizeLabel(sample.label, options),
     predicted_label: normalizeLabel(sample.predicted_label, options),
@@ -150,11 +144,9 @@ export interface UnknownLabelOptions {
  */
 export function handleUnknownLabels(
   dataset: EvalDataset,
-  options: UnknownLabelOptions
+  options: UnknownLabelOptions,
 ): EvalDataset {
-  const knownLabels = new Set(
-    options.knownLabels ?? dataset.metadata.labels
-  );
+  const knownLabels = new Set(options.knownLabels ?? dataset.metadata.labels);
   const unknownLabel = options.unknownLabel ?? 'unknown';
 
   let newSamples: ClassificationResult[];
@@ -166,12 +158,12 @@ export function handleUnknownLabels(
 
     case 'remove':
       newSamples = dataset.samples.filter(
-        s => knownLabels.has(s.label) && knownLabels.has(s.predicted_label)
+        (s) => knownLabels.has(s.label) && knownLabels.has(s.predicted_label),
       );
       break;
 
     case 'map_to_unknown':
-      newSamples = dataset.samples.map(s => ({
+      newSamples = dataset.samples.map((s) => ({
         ...s,
         label: knownLabels.has(s.label) ? s.label : unknownLabel,
         predicted_label: knownLabels.has(s.predicted_label) ? s.predicted_label : unknownLabel,
@@ -200,10 +192,7 @@ export function handleUnknownLabels(
 /**
  * Get parent label for a given label in a hierarchy
  */
-export function getParentLabel(
-  label: string,
-  hierarchy: LabelHierarchy
-): string | null {
+export function getParentLabel(label: string, hierarchy: LabelHierarchy): string | null {
   for (const [parent, children] of Object.entries(hierarchy)) {
     if (children.includes(label)) {
       return parent;
@@ -222,25 +211,22 @@ export function isLeafLabel(label: string, hierarchy: LabelHierarchy): boolean {
 /**
  * Get all labels at a specific level in the hierarchy
  */
-export function getLabelsAtLevel(
-  hierarchy: LabelHierarchy,
-  level: number = 0
-): string[] {
+export function getLabelsAtLevel(hierarchy: LabelHierarchy, level: number = 0): string[] {
   if (level === 0) {
     // Root level - labels that are not children of any other label
     const allChildren = new Set(Object.values(hierarchy).flat());
-    return Object.keys(hierarchy).filter(k => !allChildren.has(k));
+    return Object.keys(hierarchy).filter((k) => !allChildren.has(k));
   }
 
   // Get labels at the specified level
   const labelsAtLevel: string[] = [];
-  
+
   function traverse(current: string, currentLevel: number): void {
     if (currentLevel === level) {
       labelsAtLevel.push(current);
       return;
     }
-    
+
     const children = hierarchy[current] ?? [];
     for (const child of children) {
       traverse(child, currentLevel + 1);
@@ -262,7 +248,7 @@ export function getLabelsAtLevel(
 export function computeHierarchicalMetrics(
   dataset: EvalDataset,
   hierarchy: LabelHierarchy,
-  level: number = 0
+  level: number = 0,
 ): { total: number; correct: number; accuracy: number } {
   const labelsAtLevel = getLabelsAtLevel(hierarchy, level);
   const labelSet = new Set(labelsAtLevel);

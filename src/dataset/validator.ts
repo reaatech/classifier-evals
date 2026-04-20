@@ -141,7 +141,7 @@ function analyzeLabelDistribution(samples: ClassificationResult[]): ValidationWa
   }
 
   // Check for single-sample classes
-  const singleSampleClasses = labels.filter(l => labelCounts[l] === 1);
+  const singleSampleClasses = labels.filter((l) => labelCounts[l] === 1);
   if (singleSampleClasses.length > 0) {
     warnings.push({
       type: 'single_sample_classes',
@@ -165,7 +165,7 @@ function analyzeLabelDistribution(samples: ClassificationResult[]): ValidationWa
  */
 function detectDataLeakage(samples: ClassificationResult[]): ValidationWarning[] {
   const warnings: ValidationWarning[] = [];
-  const perfectMatches = samples.filter(s => s.label === s.predicted_label).length;
+  const perfectMatches = samples.filter((s) => s.label === s.predicted_label).length;
   const perfectRate = perfectMatches / samples.length;
 
   if (perfectRate > 0.95 && samples.length > 10) {
@@ -180,7 +180,7 @@ function detectDataLeakage(samples: ClassificationResult[]): ValidationWarning[]
 
 /**
  * Validate an evaluation dataset
- * 
+ *
  * @param dataset - The dataset to validate
  * @returns Validation result with errors and warnings
  */
@@ -211,7 +211,7 @@ export function validateDataset(dataset: EvalDataset): ValidationResult {
 
   // Check confidence distribution if present
   if (dataset.metadata.has_confidence) {
-    const lowConfidence = dataset.samples.filter(s => s.confidence < 0.5).length;
+    const lowConfidence = dataset.samples.filter((s) => s.confidence < 0.5).length;
     const lowConfidenceRate = lowConfidence / dataset.samples.length;
 
     if (lowConfidenceRate > 0.5) {
@@ -271,11 +271,10 @@ export function getDatasetSummary(dataset: EvalDataset): {
   avgConfidence: number;
   hasConfidence: boolean;
 } {
-  const correctPredictions = dataset.samples.filter(
-    s => s.label === s.predicted_label
-  ).length;
+  const correctPredictions = dataset.samples.filter((s) => s.label === s.predicted_label).length;
 
-  const avgConfidence = dataset.samples.reduce((sum, s) => sum + s.confidence, 0) / dataset.samples.length;
+  const avgConfidence =
+    dataset.samples.reduce((sum, s) => sum + s.confidence, 0) / dataset.samples.length;
 
   return {
     totalSamples: dataset.samples.length,

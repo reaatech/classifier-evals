@@ -49,7 +49,9 @@ export function reportCommand(program: Command): void {
           const resultsJson = fs.readFileSync(options.results, 'utf-8');
           evalRun = JSON.parse(resultsJson) as EvalRun;
         } catch (err) {
-          throw new Error(`Failed to parse results file "${options.results}": ${(err as Error).message}`);
+          throw new Error(
+            `Failed to parse results file "${options.results}": ${(err as Error).message}`,
+          );
         }
 
         // Generate report

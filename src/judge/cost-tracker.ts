@@ -68,12 +68,7 @@ export class CostTracker {
   /**
    * Add cost for a single API call
    */
-  addCost(
-    model: string,
-    inputTokens: number,
-    outputTokens: number,
-    category?: string
-  ): void {
+  addCost(model: string, inputTokens: number, outputTokens: number, category?: string): void {
     const pricing = MODEL_PRICING[model] ?? { inputPricePerM: 1, outputPricePerM: 2 };
 
     const inputCost = (inputTokens / 1_000_000) * pricing.inputPricePerM;
@@ -109,7 +104,7 @@ export class CostTracker {
     model: string,
     estimatedInputTokens: number,
     estimatedOutputTokens: number,
-    numSamples: number
+    numSamples: number,
   ): number {
     const pricing = MODEL_PRICING[model] ?? { inputPricePerM: 1, outputPricePerM: 2 };
     const perSampleCost =
@@ -121,21 +116,12 @@ export class CostTracker {
   /**
    * Check whether an estimated request can fit within the remaining budget.
    */
-  canAfford(
-    model: string,
-    estimatedInputTokens: number,
-    estimatedOutputTokens: number
-  ): boolean {
+  canAfford(model: string, estimatedInputTokens: number, estimatedOutputTokens: number): boolean {
     if (!this.budgetConfig) {
       return true;
     }
 
-    const estimatedCost = this.estimateCost(
-      model,
-      estimatedInputTokens,
-      estimatedOutputTokens,
-      1
-    );
+    const estimatedCost = this.estimateCost(model, estimatedInputTokens, estimatedOutputTokens, 1);
 
     if (
       this.budgetConfig.maxCostPerSample !== undefined &&
@@ -159,7 +145,9 @@ export class CostTracker {
    * Check if budget is exceeded
    */
   private checkBudget(): void {
-    if (!this.budgetConfig) {return;}
+    if (!this.budgetConfig) {
+      return;
+    }
 
     const { maxBudget, alertThreshold } = this.budgetConfig;
     const budgetRatio = this.totalCost / maxBudget;

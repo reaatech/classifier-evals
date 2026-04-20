@@ -27,7 +27,7 @@ function createVote(
   isCorrect: boolean,
   confidence: number = 0.9,
   cost: number = 0.01,
-  model: string = 'gpt-4'
+  model: string = 'gpt-4',
 ): JudgeVote {
   return {
     judgeId,
@@ -152,7 +152,7 @@ describe('Consensus Voting', () => {
       const sample = createSample();
       const votes: JudgeVote[] = [
         createVote('j1', false, 0.9), // Low reliability judge says incorrect
-        createVote('j2', true, 0.9),  // High reliability judge says correct
+        createVote('j2', true, 0.9), // High reliability judge says correct
         createVote('j3', false, 0.9), // Low reliability judge says incorrect
       ];
 
@@ -186,9 +186,7 @@ describe('Consensus Voting', () => {
         useWeightedVoting: false,
       };
 
-      expect(() => executeConsensusVoting(sample, votes, config)).toThrow(
-        'Insufficient judges'
-      );
+      expect(() => executeConsensusVoting(sample, votes, config)).toThrow('Insufficient judges');
     });
 
     it('should calculate total cost correctly', () => {
@@ -207,7 +205,7 @@ describe('Consensus Voting', () => {
       };
 
       const result = executeConsensusVoting(sample, votes, config);
-      expect(result.totalCost).toBe(0.10);
+      expect(result.totalCost).toBe(0.1);
     });
   });
 });
@@ -215,8 +213,14 @@ describe('Consensus Voting', () => {
 describe('Batch Consensus Voting', () => {
   it('should process multiple samples', () => {
     const samples = [
-      { sample: createSample('text1'), votes: [createVote('j1', true), createVote('j2', true), createVote('j3', true)] },
-      { sample: createSample('text2'), votes: [createVote('j1', false), createVote('j2', false), createVote('j3', false)] },
+      {
+        sample: createSample('text1'),
+        votes: [createVote('j1', true), createVote('j2', true), createVote('j3', true)],
+      },
+      {
+        sample: createSample('text2'),
+        votes: [createVote('j1', false), createVote('j2', false), createVote('j3', false)],
+      },
     ];
 
     const config: ConsensusConfig = {
@@ -278,7 +282,7 @@ describe('Disagreement Analysis', () => {
 describe('Judge Count Optimization', () => {
   it('should find optimal judge count', () => {
     const sample = createSample();
-    
+
     // Create historical results with varying judge counts
     const historicalResults = [
       {
@@ -292,7 +296,13 @@ describe('Judge Count Optimization', () => {
       },
       {
         sample,
-        votes: [createVote('j1', true), createVote('j2', true), createVote('j3', true), createVote('j4', true), createVote('j5', true)],
+        votes: [
+          createVote('j1', true),
+          createVote('j2', true),
+          createVote('j3', true),
+          createVote('j4', true),
+          createVote('j5', true),
+        ],
         consensusCorrect: true,
         consensusConfidence: 1,
         agreementRate: 1,

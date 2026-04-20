@@ -25,7 +25,7 @@ const server = new Server(
     capabilities: {
       tools: {},
     },
-  }
+  },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -43,7 +43,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             predictions: {
               type: 'array',
-              description: 'Array of prediction objects with text, label, predicted_label, confidence',
+              description:
+                'Array of prediction objects with text, label, predicted_label, confidence',
               items: {
                 type: 'object',
               },
@@ -176,16 +177,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await generateReportTool(args as Record<string, unknown>);
 
       default:
-        throw new McpError(
-          ErrorCode.MethodNotFound,
-          `Unknown tool: ${name}`
-        );
+        throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
   } catch (error) {
     logger.error({ error, tool: name }, 'Tool execution failed');
     throw new McpError(
       ErrorCode.InternalError,
-      `Tool execution failed: ${(error as Error).message}`
+      `Tool execution failed: ${(error as Error).message}`,
     );
   }
 });

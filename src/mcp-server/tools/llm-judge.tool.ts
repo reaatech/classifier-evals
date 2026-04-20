@@ -7,18 +7,12 @@ import { executeBatchConsensusVoting } from '../../judge/consensus-voting.js';
 import { createJudgeEngine } from '../../judge/judge-engine.js';
 import type { ClassificationResult } from '../../types/index.js';
 
-export async function llmJudgeTool(
-  args: Record<string, unknown>
-): Promise<CallToolResult> {
+export async function llmJudgeTool(args: Record<string, unknown>): Promise<CallToolResult> {
   const samples = args.samples as ClassificationResult[] | undefined;
   const judgeModel = args.judge_model as string | undefined;
   const budgetLimit = args.budget_limit as number | undefined;
 
-  if (
-    !Array.isArray(samples) ||
-    judgeModel === undefined ||
-    judgeModel === ''
-  ) {
+  if (!Array.isArray(samples) || judgeModel === undefined || judgeModel === '') {
     return {
       content: [
         {
@@ -30,17 +24,17 @@ export async function llmJudgeTool(
     };
   }
 
-  const consensusCount =
-    typeof args.consensus_count === 'number' ? args.consensus_count : 1;
+  const consensusCount = typeof args.consensus_count === 'number' ? args.consensus_count : 1;
   const judge = createJudgeEngine({
     model: judgeModel,
     maxConcurrency: consensusCount,
-    budget: budgetLimit !== undefined
-      ? {
-          maxBudget: budgetLimit,
-          alertThreshold: 80,
-        }
-      : undefined,
+    budget:
+      budgetLimit !== undefined
+        ? {
+            maxBudget: budgetLimit,
+            alertThreshold: 80,
+          }
+        : undefined,
   });
   const result =
     consensusCount > 1
@@ -60,7 +54,7 @@ export async function llmJudgeTool(
 async function evaluateConsensus(
   judge: ReturnType<typeof createJudgeEngine>,
   samples: ClassificationResult[],
-  consensusCount: number
+  consensusCount: number,
 ): Promise<{
   consensus_results: ReturnType<typeof executeBatchConsensusVoting>;
   totalCost: number;

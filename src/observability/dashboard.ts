@@ -108,16 +108,17 @@ export function evalRunToTrendDataPoint(run: EvalRun): TrendDataPoint {
       precision_macro: run.metrics.precision_macro,
       recall_macro: run.metrics.recall_macro,
     },
-    cost: run.judge_cost !== undefined
-      ? {
-          total: run.judge_cost,
-          per_sample: run.total_samples > 0 ? run.judge_cost / run.total_samples : 0,
-        }
-      : undefined,
+    cost:
+      run.judge_cost !== undefined
+        ? {
+            total: run.judge_cost,
+            per_sample: run.total_samples > 0 ? run.judge_cost / run.total_samples : 0,
+          }
+        : undefined,
     gateResults: run.gate_results
       ? {
           passed: run.all_gates_passed ?? false,
-          passedCount: run.gate_results.filter(g => g.passed).length,
+          passedCount: run.gate_results.filter((g) => g.passed).length,
           totalCount: run.gate_results.length,
         }
       : undefined,
@@ -130,14 +131,14 @@ export function evalRunToTrendDataPoint(run: EvalRun): TrendDataPoint {
 export function calculateTrendStatistics(
   dataPoints: TrendDataPoint[],
   metricKey: keyof TrendDataPoint['metrics'],
-  config: DashboardConfig = DEFAULT_DASHBOARD_CONFIG
+  config: DashboardConfig = DEFAULT_DASHBOARD_CONFIG,
 ): TrendStatistics | null {
   if (dataPoints.length < config.minDataPoints) {
     return null;
   }
 
-  const values = dataPoints.map(dp => dp.metrics[metricKey]);
-  const timestamps = dataPoints.map(dp => dp.timestamp);
+  const values = dataPoints.map((dp) => dp.metrics[metricKey]);
+  const timestamps = dataPoints.map((dp) => dp.timestamp);
 
   const sortedValues = [...values].sort((a, b) => a - b);
   const min = sortedValues[0]!;
@@ -145,13 +146,10 @@ export function calculateTrendStatistics(
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
   const median =
     sortedValues.length % 2 === 0
-      ? (sortedValues[sortedValues.length / 2 - 1]! +
-          sortedValues[sortedValues.length / 2]!) /
-        2
+      ? (sortedValues[sortedValues.length / 2 - 1]! + sortedValues[sortedValues.length / 2]!) / 2
       : sortedValues[Math.floor(sortedValues.length / 2)]!;
 
-  const variance =
-    values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
+  const variance = values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
   const stdDev = Math.sqrt(variance);
 
   // Calculate trend using linear regression slope
@@ -188,9 +186,7 @@ export function calculateTrendStatistics(
 /**
  * Generate a dashboard summary from multiple evaluation runs
  */
-export function generateDashboardSummary(
-  runs: EvalRun[]
-): DashboardSummary {
+export function generateDashboardSummary(runs: EvalRun[]): DashboardSummary {
   if (runs.length === 0) {
     return {
       totalRuns: 0,
@@ -204,25 +200,28 @@ export function generateDashboardSummary(
     };
   }
 
-  const dataPoints = runs.map(evalRunToTrendDataPoint).sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  );
+  const dataPoints = runs
+    .map(evalRunToTrendDataPoint)
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-  const models = [...new Set(runs.map(r => r.metadata?.model as string).filter(Boolean))] as string[];
-  const datasets = [...new Set(runs.map(r => r.dataset_name).filter(Boolean))] as string[];
+  const models = [
+    ...new Set(runs.map((r) => r.metadata?.model as string).filter(Boolean)),
+  ] as string[];
+  const datasets = [...new Set(runs.map((r) => r.dataset_name).filter(Boolean))] as string[];
 
   const latestRun = dataPoints[dataPoints.length - 1];
   const bestRun = [...dataPoints].sort((a, b) => b.metrics.accuracy - a.metrics.accuracy)[0];
   const worstRun = [...dataPoints].sort((a, b) => a.metrics.accuracy - b.metrics.accuracy)[0];
 
-  const avgAccuracy = dataPoints.reduce((sum, dp) => sum + dp.metrics.accuracy, 0) / dataPoints.length;
-  const avgF1Macro = dataPoints.reduce((sum, dp) => sum + dp.metrics.f1_macro, 0) / dataPoints.length;
-  const avgF1Micro = dataPoints.reduce((sum, dp) => sum + dp.metrics.f1_micro, 0) / dataPoints.length;
+  const avgAccuracy =
+    dataPoints.reduce((sum, dp) => sum + dp.metrics.accuracy, 0) / dataPoints.length;
+  const avgF1Macro =
+    dataPoints.reduce((sum, dp) => sum + dp.metrics.f1_macro, 0) / dataPoints.length;
+  const avgF1Micro =
+    dataPoints.reduce((sum, dp) => sum + dp.metrics.f1_micro, 0) / dataPoints.length;
 
-  const gateResults = runs.filter(r => r.gate_results);
-  const gatePassCount = gateResults.filter(
-    (r) => r.all_gates_passed === true
-  ).length;
+  const gateResults = runs.filter((r) => r.gate_results);
+  const gatePassCount = gateResults.filter((r) => r.all_gates_passed === true).length;
   const gatePassRate = gateResults.length > 0 ? gatePassCount / gateResults.length : 0;
 
   const totalCost = runs.reduce((sum, r) => sum + (r.judge_cost ?? 0), 0);
@@ -252,26 +251,18 @@ export function generateDashboardSummary(
 /**
  * Filter data points by date range
  */
-export function filterByDateRange(
-  dataPoints: TrendDataPoint[],
-  days: number
-): TrendDataPoint[] {
+export function filterByDateRange(dataPoints: TrendDataPoint[], days: number): TrendDataPoint[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
 
-  return dataPoints.filter(
-    dp => new Date(dp.timestamp).getTime() >= cutoff.getTime()
-  );
+  return dataPoints.filter((dp) => new Date(dp.timestamp).getTime() >= cutoff.getTime());
 }
 
 /**
  * Filter data points by model
  */
-export function filterByModel(
-  dataPoints: TrendDataPoint[],
-  model: string
-): TrendDataPoint[] {
-  return dataPoints.filter(dp => dp.model === model);
+export function filterByModel(dataPoints: TrendDataPoint[], model: string): TrendDataPoint[] {
+  return dataPoints.filter((dp) => dp.model === model);
 }
 
 /**
@@ -279,9 +270,9 @@ export function filterByModel(
  */
 export function filterByDataset(
   dataPoints: TrendDataPoint[],
-  datasetName: string
+  datasetName: string,
 ): TrendDataPoint[] {
-  return dataPoints.filter(dp => dp.datasetName === datasetName);
+  return dataPoints.filter((dp) => dp.datasetName === datasetName);
 }
 
 /**
@@ -289,7 +280,7 @@ export function filterByDataset(
  */
 export function compareEvalRuns(
   baselineRuns: EvalRun[],
-  candidateRuns: EvalRun[]
+  candidateRuns: EvalRun[],
 ): {
   baseline: DashboardSummary;
   candidate: DashboardSummary;
@@ -371,7 +362,7 @@ export function generateDashboardReport(summary: DashboardSummary): string {
  */
 export function exportDashboardData(
   dataPoints: TrendDataPoint[],
-  format: 'json' | 'csv' = 'json'
+  format: 'json' | 'csv' = 'json',
 ): string {
   if (format === 'json') {
     return JSON.stringify(dataPoints, null, 2);
@@ -395,7 +386,7 @@ export function exportDashboardData(
     'gate_total_count',
   ];
 
-  const rows = dataPoints.map(dp => [
+  const rows = dataPoints.map((dp) => [
     dp.timestamp,
     dp.runId,
     dp.datasetName ?? '',
@@ -412,5 +403,5 @@ export function exportDashboardData(
     (dp.gateResults?.totalCount ?? '').toString(),
   ]);
 
-  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
 }

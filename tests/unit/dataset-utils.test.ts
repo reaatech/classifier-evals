@@ -21,12 +21,42 @@ import type { EvalDataset } from '../../src/types/index.js';
 function createDataset(): EvalDataset {
   return {
     samples: [
-      { text: 'Reset password', label: 'auth.login', predicted_label: 'auth.login', confidence: 0.9 },
-      { text: 'Refund request', label: 'billing.refund', predicted_label: 'billing.refund', confidence: 0.8 },
-      { text: 'Close account', label: 'account.close', predicted_label: 'unknown', confidence: 0.4 },
-      { text: 'Reset password', label: 'auth.login', predicted_label: 'auth.login', confidence: 0.95 },
-      { text: 'Need help', label: 'support.agent', predicted_label: 'support.agent', confidence: 0.7 },
-      { text: 'Delete profile', label: 'account.close', predicted_label: 'account.close', confidence: 0.9 },
+      {
+        text: 'Reset password',
+        label: 'auth.login',
+        predicted_label: 'auth.login',
+        confidence: 0.9,
+      },
+      {
+        text: 'Refund request',
+        label: 'billing.refund',
+        predicted_label: 'billing.refund',
+        confidence: 0.8,
+      },
+      {
+        text: 'Close account',
+        label: 'account.close',
+        predicted_label: 'unknown',
+        confidence: 0.4,
+      },
+      {
+        text: 'Reset password',
+        label: 'auth.login',
+        predicted_label: 'auth.login',
+        confidence: 0.95,
+      },
+      {
+        text: 'Need help',
+        label: 'support.agent',
+        predicted_label: 'support.agent',
+        confidence: 0.7,
+      },
+      {
+        text: 'Delete profile',
+        label: 'account.close',
+        predicted_label: 'account.close',
+        confidence: 0.9,
+      },
     ],
     metadata: {
       format: 'jsonl',
@@ -49,7 +79,7 @@ describe('dataset utilities', () => {
   it('normalizes labels, applies aliases, and handles unknown labels', () => {
     const dataset = createDataset();
     expect(normalizeLabel('  Auth Login  ', { normalizeSeparators: 'underscores' })).toBe(
-      'auth_login'
+      'auth_login',
     );
 
     const normalized = normalizeLabels(dataset, { normalizeSeparators: 'underscores' });
@@ -221,7 +251,7 @@ describe('dataset utilities', () => {
     };
 
     const result = validateDataset(dataset);
-    const imbalanceWarnings = result.warnings.filter(w => w.type === 'moderate_imbalance');
+    const imbalanceWarnings = result.warnings.filter((w) => w.type === 'moderate_imbalance');
     expect(imbalanceWarnings.length).toBeGreaterThan(0);
   });
 
@@ -234,7 +264,7 @@ describe('dataset utilities', () => {
     }));
 
     const result = validateSamples(samples);
-    const classWarnings = result.warnings.filter(w => w.type === 'too_many_classes');
+    const classWarnings = result.warnings.filter((w) => w.type === 'too_many_classes');
     expect(classWarnings.length).toBeGreaterThan(0);
   });
 
@@ -249,7 +279,7 @@ describe('dataset utilities', () => {
     const { loadDatasetFromContent } = await import('../../src/dataset/loader.js');
     const dataset = await loadDatasetFromContent(JSON.stringify(samples), 'json');
     const result = validateDataset(dataset);
-    const leakageWarnings = result.warnings.filter(w => w.type === 'suspected_data_leakage');
+    const leakageWarnings = result.warnings.filter((w) => w.type === 'suspected_data_leakage');
     expect(leakageWarnings.length).toBeGreaterThan(0);
   });
 
@@ -264,7 +294,7 @@ describe('dataset utilities', () => {
     const { loadDatasetFromContent } = await import('../../src/dataset/loader.js');
     const dataset = await loadDatasetFromContent(JSON.stringify(samples), 'json');
     const result = validateDataset(dataset);
-    const confWarnings = result.warnings.filter(w => w.type === 'low_confidence_majority');
+    const confWarnings = result.warnings.filter((w) => w.type === 'low_confidence_majority');
     expect(confWarnings.length).toBeGreaterThan(0);
   });
 });

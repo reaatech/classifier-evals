@@ -3,31 +3,26 @@
  * Accuracy, precision, recall, F1 (macro/micro/weighted), MCC, Cohen's kappa
  */
 
-import {
-  ClassificationResult,
-  ClassificationMetrics,
-  ConfusionMatrix,
-} from '../types/index.js';
+import { ClassificationResult, ClassificationMetrics, ConfusionMatrix } from '../types/index.js';
 import { buildConfusionMatrix, getTotalCorrect, getTotalSamples } from './confusion-matrix.js';
 
 /**
  * Calculate overall accuracy
  */
 export function calculateAccuracy(samples: ClassificationResult[]): number {
-  if (samples.length === 0) {return 0;}
-  const correct = samples.filter(s => s.label === s.predicted_label).length;
+  if (samples.length === 0) {
+    return 0;
+  }
+  const correct = samples.filter((s) => s.label === s.predicted_label).length;
   return correct / samples.length;
 }
 
 /**
  * Calculate precision for a single class
  */
-function calculatePrecision(
-  samples: ClassificationResult[],
-  label: string
-): number {
-  const tp = samples.filter(s => s.predicted_label === label && s.label === label).length;
-  const fp = samples.filter(s => s.predicted_label === label && s.label !== label).length;
+function calculatePrecision(samples: ClassificationResult[], label: string): number {
+  const tp = samples.filter((s) => s.predicted_label === label && s.label === label).length;
+  const fp = samples.filter((s) => s.predicted_label === label && s.label !== label).length;
   return tp + fp > 0 ? tp / (tp + fp) : 0;
 }
 
@@ -35,8 +30,8 @@ function calculatePrecision(
  * Calculate recall for a single class
  */
 function calculateRecall(samples: ClassificationResult[], label: string): number {
-  const tp = samples.filter(s => s.predicted_label === label && s.label === label).length;
-  const fn = samples.filter(s => s.predicted_label !== label && s.label === label).length;
+  const tp = samples.filter((s) => s.predicted_label === label && s.label === label).length;
+  const fn = samples.filter((s) => s.predicted_label !== label && s.label === label).length;
   return tp + fn > 0 ? tp / (tp + fn) : 0;
 }
 
@@ -50,36 +45,33 @@ function calculateF1(precision: number, recall: number): number {
 /**
  * Calculate macro-averaged precision
  */
-export function calculatePrecisionMacro(
-  samples: ClassificationResult[],
-  labels: string[]
-): number {
-  if (labels.length === 0) {return 0;}
-  const precisions = labels.map(l => calculatePrecision(samples, l));
+export function calculatePrecisionMacro(samples: ClassificationResult[], labels: string[]): number {
+  if (labels.length === 0) {
+    return 0;
+  }
+  const precisions = labels.map((l) => calculatePrecision(samples, l));
   return precisions.reduce((sum, p) => sum + p, 0) / labels.length;
 }
 
 /**
  * Calculate macro-averaged recall
  */
-export function calculateRecallMacro(
-  samples: ClassificationResult[],
-  labels: string[]
-): number {
-  if (labels.length === 0) {return 0;}
-  const recalls = labels.map(l => calculateRecall(samples, l));
+export function calculateRecallMacro(samples: ClassificationResult[], labels: string[]): number {
+  if (labels.length === 0) {
+    return 0;
+  }
+  const recalls = labels.map((l) => calculateRecall(samples, l));
   return recalls.reduce((sum, r) => sum + r, 0) / labels.length;
 }
 
 /**
  * Calculate macro-averaged F1 score
  */
-export function calculateF1Macro(
-  samples: ClassificationResult[],
-  labels: string[]
-): number {
-  if (labels.length === 0) {return 0;}
-  const f1s = labels.map(l => {
+export function calculateF1Macro(samples: ClassificationResult[], labels: string[]): number {
+  if (labels.length === 0) {
+    return 0;
+  }
+  const f1s = labels.map((l) => {
     const p = calculatePrecision(samples, l);
     const r = calculateRecall(samples, l);
     return calculateF1(p, r);
@@ -113,12 +105,14 @@ export function calculateF1Micro(samples: ClassificationResult[]): number {
  */
 export function calculatePrecisionWeighted(
   samples: ClassificationResult[],
-  labels: string[]
+  labels: string[],
 ): number {
-  if (labels.length === 0) {return 0;}
+  if (labels.length === 0) {
+    return 0;
+  }
   const total = samples.length;
-  const weighted = labels.map(l => {
-    const support = samples.filter(s => s.label === l).length;
+  const weighted = labels.map((l) => {
+    const support = samples.filter((s) => s.label === l).length;
     return calculatePrecision(samples, l) * (support / total);
   });
   return weighted.reduce((sum, w) => sum + w, 0);
@@ -127,14 +121,13 @@ export function calculatePrecisionWeighted(
 /**
  * Calculate weighted-averaged recall
  */
-export function calculateRecallWeighted(
-  samples: ClassificationResult[],
-  labels: string[]
-): number {
-  if (labels.length === 0) {return 0;}
+export function calculateRecallWeighted(samples: ClassificationResult[], labels: string[]): number {
+  if (labels.length === 0) {
+    return 0;
+  }
   const total = samples.length;
-  const weighted = labels.map(l => {
-    const support = samples.filter(s => s.label === l).length;
+  const weighted = labels.map((l) => {
+    const support = samples.filter((s) => s.label === l).length;
     return calculateRecall(samples, l) * (support / total);
   });
   return weighted.reduce((sum, w) => sum + w, 0);
@@ -143,14 +136,13 @@ export function calculateRecallWeighted(
 /**
  * Calculate weighted-averaged F1 score
  */
-export function calculateF1Weighted(
-  samples: ClassificationResult[],
-  labels: string[]
-): number {
-  if (labels.length === 0) {return 0;}
+export function calculateF1Weighted(samples: ClassificationResult[], labels: string[]): number {
+  if (labels.length === 0) {
+    return 0;
+  }
   const total = samples.length;
-  const weighted = labels.map(l => {
-    const support = samples.filter(s => s.label === l).length;
+  const weighted = labels.map((l) => {
+    const support = samples.filter((s) => s.label === l).length;
     const p = calculatePrecision(samples, l);
     const r = calculateRecall(samples, l);
     return calculateF1(p, r) * (support / total);
@@ -169,17 +161,21 @@ export function calculateMCC(samples: ClassificationResult[]): number {
   const matrix = cm.matrix;
   const n = samples.length;
 
-  if (n === 0) {return 0;}
+  if (n === 0) {
+    return 0;
+  }
 
   const k = cm.labels.length;
-  if (k < 2) {return 0;}
+  if (k < 2) {
+    return 0;
+  }
 
   // c = trace (total correct)
   const c = matrix.reduce((sum, row, i) => sum + row[i]!, 0);
   const s = n;
 
   // Row sums (true counts) and column sums (predicted counts)
-  const t: number[] = matrix.map(row => row.reduce((a, b) => a + b, 0));
+  const t: number[] = matrix.map((row) => row.reduce((a, b) => a + b, 0));
   const p: number[] = matrix[0]!.map((_, j) => matrix.reduce((sum, row) => sum + row[j]!, 0));
 
   const sumPKTK = p.reduce((sum, pk, i) => sum + pk * t[i]!, 0);
@@ -192,7 +188,9 @@ export function calculateMCC(samples: ClassificationResult[]): number {
   const denomLeft = s2 - sumPK2;
   const denomRight = s2 - sumTK2;
 
-  if (denomLeft <= 0 || denomRight <= 0) {return 0;}
+  if (denomLeft <= 0 || denomRight <= 0) {
+    return 0;
+  }
 
   return numerator / Math.sqrt(denomLeft * denomRight);
 }
@@ -222,7 +220,9 @@ export function calculateCohensKappa(samples: ClassificationResult[]): number {
     pe += (trueCount / n) * (predCount / n);
   }
 
-  if (pe === 1) {return 1;} // Perfect agreement
+  if (pe === 1) {
+    return 1;
+  } // Perfect agreement
 
   return (po - pe) / (1 - pe);
 }
@@ -264,13 +264,17 @@ export function calculateAllMetrics(samples: ClassificationResult[]): Classifica
 function calculateMCCFromMatrix(cm: ConfusionMatrix): number {
   const matrix = cm.matrix;
   const total = getTotalSamples(cm);
-  if (total === 0) {return 0;}
+  if (total === 0) {
+    return 0;
+  }
   const k = cm.labels.length;
-  if (k < 2) {return 0;}
+  if (k < 2) {
+    return 0;
+  }
 
   const c = matrix.reduce((sum, row, i) => sum + row[i]!, 0);
   const s = total;
-  const t: number[] = matrix.map(row => row.reduce((a, b) => a + b, 0));
+  const t: number[] = matrix.map((row) => row.reduce((a, b) => a + b, 0));
   const p: number[] = matrix[0]!.map((_, j) => matrix.reduce((sum, row) => sum + row[j]!, 0));
 
   const sumPKTK = p.reduce((sum, pk, i) => sum + pk * t[i]!, 0);
@@ -280,7 +284,9 @@ function calculateMCCFromMatrix(cm: ConfusionMatrix): number {
   const sumTK2 = t.reduce((sum, tk) => sum + tk * tk, 0);
   const denomLeft = s2 - sumPK2;
   const denomRight = s2 - sumTK2;
-  if (denomLeft <= 0 || denomRight <= 0) {return 0;}
+  if (denomLeft <= 0 || denomRight <= 0) {
+    return 0;
+  }
   return numerator / Math.sqrt(denomLeft * denomRight);
 }
 
@@ -290,7 +296,9 @@ function calculateMCCFromMatrix(cm: ConfusionMatrix): number {
 function calculateKappaFromMatrix(cm: ConfusionMatrix): number {
   const matrix = cm.matrix;
   const n = getTotalSamples(cm);
-  if (n === 0) {return 0;}
+  if (n === 0) {
+    return 0;
+  }
 
   const po = matrix.reduce((sum, row, i) => sum + row[i]!, 0) / n;
   let pe = 0;
@@ -299,7 +307,9 @@ function calculateKappaFromMatrix(cm: ConfusionMatrix): number {
     const predCount = matrix.reduce((sum, row) => sum + row[i]!, 0);
     pe += (trueCount / n) * (predCount / n);
   }
-  if (pe === 1) {return 1;}
+  if (pe === 1) {
+    return 1;
+  }
   return (po - pe) / (1 - pe);
 }
 export function calculateMetricsFromCM(cm: ConfusionMatrix): ClassificationMetrics {

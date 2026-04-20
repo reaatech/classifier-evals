@@ -4,11 +4,7 @@
  * identifies systematic biases, and exports results for analysis
  */
 
-import {
-  ClassificationResult,
-  JudgedResult,
-  CostAccount,
-} from '../types/index.js';
+import { ClassificationResult, JudgedResult, CostAccount } from '../types/index.js';
 import { ConsensusResult } from './consensus-voting.js';
 
 /**
@@ -112,10 +108,10 @@ export const DEFAULT_AGGREGATOR_CONFIG: AggregatorConfig = {
 export function aggregateJudgeResults(
   judgedResults: JudgedResult[],
   costBreakdown: CostAccount,
-  config: AggregatorConfig = DEFAULT_AGGREGATOR_CONFIG
+  config: AggregatorConfig = DEFAULT_AGGREGATOR_CONFIG,
 ): JudgeAggregateResults {
   const totalSamples = judgedResults.length;
-  const agreedResults = judgedResults.filter(r => {
+  const agreedResults = judgedResults.filter((r) => {
     const modelCorrect = r.label === r.predicted_label;
     const judgeCorrect = r.judge_correct ?? false;
     return modelCorrect === judgeCorrect;
@@ -124,8 +120,7 @@ export function aggregateJudgeResults(
   const agreementRate = totalSamples > 0 ? agreedResults.length / totalSamples : 0;
   const avgJudgeConfidence =
     totalSamples > 0
-      ? judgedResults.reduce((sum, r) => sum + (r.judge_confidence ?? 0), 0) /
-        totalSamples
+      ? judgedResults.reduce((sum, r) => sum + (r.judge_confidence ?? 0), 0) / totalSamples
       : 0;
 
   // Per-class breakdown
@@ -159,7 +154,7 @@ export function aggregateJudgeResults(
 export function aggregateConsensusResults(
   consensusResults: ConsensusResult[],
   costBreakdown: CostAccount,
-  config: AggregatorConfig = DEFAULT_AGGREGATOR_CONFIG
+  config: AggregatorConfig = DEFAULT_AGGREGATOR_CONFIG,
 ): JudgeAggregateResults {
   const totalSamples = consensusResults.length;
 
@@ -185,7 +180,7 @@ export function aggregateConsensusResults(
   const biases = detectSystematicBiasesFromConsensus(
     perClassBreakdown,
     [...consensusResults],
-    config
+    config,
   );
 
   // Calculate total cost from votes
@@ -213,9 +208,7 @@ export function aggregateConsensusResults(
 /**
  * Calculate per-class breakdown from judged results
  */
-function calculatePerClassBreakdown(
-  judgedResults: JudgedResult[]
-): ClassBreakdown[] {
+function calculatePerClassBreakdown(judgedResults: JudgedResult[]): ClassBreakdown[] {
   const classData = new Map<
     string,
     {
@@ -254,10 +247,8 @@ function calculatePerClassBreakdown(
     judgeAgreed: data.agreed,
     judgeDisagreed: data.total - data.agreed,
     agreementRate: data.total > 0 ? data.agreed / data.total : 0,
-    avgConfidence:
-      data.total > 0 ? data.totalJudgeConfidence / data.total : 0,
-    avgModelConfidence:
-      data.total > 0 ? data.totalModelConfidence / data.total : 0,
+    avgConfidence: data.total > 0 ? data.totalJudgeConfidence / data.total : 0,
+    avgModelConfidence: data.total > 0 ? data.totalModelConfidence / data.total : 0,
   }));
 }
 
@@ -265,7 +256,7 @@ function calculatePerClassBreakdown(
  * Calculate per-class breakdown from consensus results
  */
 function calculatePerClassBreakdownFromConsensus(
-  consensusResults: ConsensusResult[]
+  consensusResults: ConsensusResult[],
 ): ClassBreakdown[] {
   const classData = new Map<
     string,
@@ -304,10 +295,8 @@ function calculatePerClassBreakdownFromConsensus(
     judgeAgreed: data.agreed,
     judgeDisagreed: data.total - data.agreed,
     agreementRate: data.total > 0 ? data.agreed / data.total : 0,
-    avgConfidence:
-      data.total > 0 ? data.totalConfidence / data.total : 0,
-    avgModelConfidence:
-      data.total > 0 ? data.totalModelConfidence / data.total : 0,
+    avgConfidence: data.total > 0 ? data.totalConfidence / data.total : 0,
+    avgModelConfidence: data.total > 0 ? data.totalModelConfidence / data.total : 0,
   }));
 }
 
@@ -317,17 +306,17 @@ function calculatePerClassBreakdownFromConsensus(
 function detectSystematicBiases(
   perClassBreakdown: ClassBreakdown[],
   judgedResults: JudgedResult[],
-  config: AggregatorConfig
+  config: AggregatorConfig,
 ): SystematicBias[] {
   const biases: SystematicBias[] = [];
 
   // Detect label bias (judge agrees more with certain labels)
   const filteredBreakdown = perClassBreakdown.filter(
-    b => b.totalSamples >= config.minSamplesPerClass
+    (b) => b.totalSamples >= config.minSamplesPerClass,
   );
 
   if (filteredBreakdown.length >= 2) {
-    const rates = filteredBreakdown.map(b => b.agreementRate);
+    const rates = filteredBreakdown.map((b) => b.agreementRate);
     const maxRate = Math.max(...rates);
     const minRate = Math.min(...rates);
     const variance = maxRate - minRate;
@@ -338,8 +327,8 @@ function detectSystematicBiases(
         description: `Judge agreement rate varies significantly across labels (max: ${(maxRate * 100).toFixed(1)}%, min: ${(minRate * 100).toFixed(1)}%)`,
         severity: variance > 0.4 ? 'high' : variance > 0.3 ? 'medium' : 'low',
         affectedLabels: [
-          filteredBreakdown.find(b => b.agreementRate === maxRate)?.label,
-          filteredBreakdown.find(b => b.agreementRate === minRate)?.label,
+          filteredBreakdown.find((b) => b.agreementRate === maxRate)?.label,
+          filteredBreakdown.find((b) => b.agreementRate === minRate)?.label,
         ].filter((l): l is string => l !== undefined && l !== ''),
         metric: 'agreement_rate_variance',
         value: variance,
@@ -370,17 +359,17 @@ function detectSystematicBiases(
 function detectSystematicBiasesFromConsensus(
   perClassBreakdown: ClassBreakdown[],
   _consensusResults: ConsensusResult[],
-  config: AggregatorConfig
+  config: AggregatorConfig,
 ): SystematicBias[] {
   const biases: SystematicBias[] = [];
 
   // Detect label bias
   const filteredBreakdown = perClassBreakdown.filter(
-    b => b.totalSamples >= config.minSamplesPerClass
+    (b) => b.totalSamples >= config.minSamplesPerClass,
   );
 
   if (filteredBreakdown.length >= 2) {
-    const rates = filteredBreakdown.map(b => b.agreementRate);
+    const rates = filteredBreakdown.map((b) => b.agreementRate);
     const maxRate = Math.max(...rates);
     const minRate = Math.min(...rates);
     const variance = maxRate - minRate;
@@ -391,8 +380,8 @@ function detectSystematicBiasesFromConsensus(
         description: `Consensus agreement rate varies significantly across labels (max: ${(maxRate * 100).toFixed(1)}%, min: ${(minRate * 100).toFixed(1)}%)`,
         severity: variance > 0.4 ? 'high' : variance > 0.3 ? 'medium' : 'low',
         affectedLabels: [
-          filteredBreakdown.find(b => b.agreementRate === maxRate)?.label,
-          filteredBreakdown.find(b => b.agreementRate === minRate)?.label,
+          filteredBreakdown.find((b) => b.agreementRate === maxRate)?.label,
+          filteredBreakdown.find((b) => b.agreementRate === minRate)?.label,
         ].filter((l): l is string => l !== undefined && l !== ''),
         metric: 'agreement_rate_variance',
         value: variance,
@@ -409,10 +398,12 @@ function detectSystematicBiasesFromConsensus(
  */
 function calculateConfidenceCorrelation(judgedResults: JudgedResult[]): number {
   const n = judgedResults.length;
-  if (n < 3) {return 0;}
+  if (n < 3) {
+    return 0;
+  }
 
-  const judgeConfidences = judgedResults.map(r => r.judge_confidence ?? 0);
-  const modelConfidences = judgedResults.map(r => r.confidence ?? 0);
+  const judgeConfidences = judgedResults.map((r) => r.judge_confidence ?? 0);
+  const modelConfidences = judgedResults.map((r) => r.confidence ?? 0);
 
   const meanJudge = judgeConfidences.reduce((a, b) => a + b, 0) / n;
   const meanModel = modelConfidences.reduce((a, b) => a + b, 0) / n;
@@ -438,7 +429,7 @@ function calculateConfidenceCorrelation(judgedResults: JudgedResult[]): number {
  */
 function analyzeDisagreements(
   judgedResults: JudgedResult[],
-  _config: AggregatorConfig
+  _config: AggregatorConfig,
 ): DisagreementAnalysis {
   const falseNegatives: DisagreementAnalysis['falseNegatives'] = [];
   const falsePositives: DisagreementAnalysis['falsePositives'] = [];
@@ -476,7 +467,7 @@ function analyzeDisagreements(
  */
 export function exportJudgeResults(
   judgedResults: JudgedResult[],
-  format: 'json' | 'csv' = 'json'
+  format: 'json' | 'csv' = 'json',
 ): string {
   if (format === 'json') {
     return JSON.stringify(judgedResults, null, 2);
@@ -495,7 +486,7 @@ export function exportJudgeResults(
     'judge_cost',
   ];
 
-  const rows = judgedResults.map(r => [
+  const rows = judgedResults.map((r) => [
     `"${(r.text ?? '').replace(/"/g, '""')}"`,
     `"${(r.label ?? '').replace(/"/g, '""')}"`,
     `"${(r.predicted_label ?? '').replace(/"/g, '""')}"`,
@@ -507,15 +498,13 @@ export function exportJudgeResults(
     (r.judge_cost ?? 0).toString(),
   ]);
 
-  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
 }
 
 /**
  * Generate a summary report of judge evaluation results
  */
-export function generateJudgeSummaryReport(
-  results: JudgeAggregateResults
-): string {
+export function generateJudgeSummaryReport(results: JudgeAggregateResults): string {
   const lines: string[] = [];
 
   lines.push('=== LLM Judge Evaluation Summary ===');
@@ -528,7 +517,7 @@ export function generateJudgeSummaryReport(
   lines.push('--- Per-Class Breakdown ---');
   for (const breakdown of results.perClassBreakdown) {
     lines.push(
-      `  ${breakdown.label}: ${breakdown.agreementRate * 100}% agreement (${breakdown.totalSamples} samples)`
+      `  ${breakdown.label}: ${breakdown.agreementRate * 100}% agreement (${breakdown.totalSamples} samples)`,
     );
   }
   lines.push('');
@@ -536,19 +525,13 @@ export function generateJudgeSummaryReport(
   if (results.biases.length > 0) {
     lines.push('--- Systematic Biases Detected ---');
     for (const bias of results.biases) {
-      lines.push(
-        `  [${bias.severity.toUpperCase()}] ${bias.type}: ${bias.description}`
-      );
+      lines.push(`  [${bias.severity.toUpperCase()}] ${bias.type}: ${bias.description}`);
     }
     lines.push('');
   }
 
-  lines.push(
-    `Total Cost: $${results.costBreakdown.total_cost.toFixed(4)}`
-  );
-  lines.push(
-    `Average Cost per Sample: $${results.costBreakdown.avg_cost_per_sample.toFixed(6)}`
-  );
+  lines.push(`Total Cost: $${results.costBreakdown.total_cost.toFixed(4)}`);
+  lines.push(`Average Cost per Sample: $${results.costBreakdown.avg_cost_per_sample.toFixed(6)}`);
 
   return lines.join('\n');
 }

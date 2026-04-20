@@ -98,14 +98,11 @@ export class JudgeEngine {
     return formatPrompt(template, sample);
   }
 
-  private estimateTokensForPrompt(prompt: {
-    system: string;
-    user: string;
-  }): { input: number; output: number } {
-    const estimatedInput = Math.max(
-      Math.ceil((prompt.system.length + prompt.user.length) / 4),
-      1
-    );
+  private estimateTokensForPrompt(prompt: { system: string; user: string }): {
+    input: number;
+    output: number;
+  } {
+    const estimatedInput = Math.max(Math.ceil((prompt.system.length + prompt.user.length) / 4), 1);
 
     return {
       input: estimatedInput,
@@ -119,11 +116,7 @@ export class JudgeEngine {
   canEvaluateSample(sample: ClassificationResult): boolean {
     const prompt = this.createPrompt(sample);
     const estimate = this.estimateTokensForPrompt(prompt);
-    const allowed = this.costTracker.canAfford(
-      this.config.model,
-      estimate.input,
-      estimate.output
-    );
+    const allowed = this.costTracker.canAfford(this.config.model, estimate.input, estimate.output);
 
     if (!allowed) {
       this.costTracker.markBudgetExceeded();
@@ -159,7 +152,7 @@ export class JudgeEngine {
       this.config.model,
       tokensUsed.input,
       tokensUsed.output,
-      (result.judge_correct ?? false) ? 'correct' : 'incorrect'
+      (result.judge_correct ?? false) ? 'correct' : 'incorrect',
     );
 
     return {
@@ -182,10 +175,7 @@ export class JudgeEngine {
       let active = 0;
 
       const maybeResolve = (): void => {
-        if (
-          active === 0 &&
-          (nextIndex >= samples.length || this.costTracker.isBudgetExceeded())
-        ) {
+        if (active === 0 && (nextIndex >= samples.length || this.costTracker.isBudgetExceeded())) {
           resolve();
         }
       };
@@ -210,8 +200,7 @@ export class JudgeEngine {
               results.push(value);
             })
             .catch((reason: unknown) => {
-              const message =
-                reason instanceof Error ? reason.message : String(reason);
+              const message = reason instanceof Error ? reason.message : String(reason);
               if (message === 'Budget exceeded before sample evaluation') {
                 return;
               }
@@ -232,7 +221,7 @@ export class JudgeEngine {
     });
 
     const costBreakdown = this.costTracker.getBreakdown();
-    const correctCount = results.filter(r => r.result.judge_correct ?? false).length;
+    const correctCount = results.filter((r) => r.result.judge_correct ?? false).length;
 
     return {
       results,
@@ -254,7 +243,7 @@ export class JudgeEngine {
    */
   private async callLLM(
     prompt: { system: string; user: string },
-    sample: ClassificationResult
+    sample: ClassificationResult,
   ): Promise<{ result: JudgedResult; tokensUsed: { input: number; output: number } }> {
     const model = this.config.model.toLowerCase();
     const retryCount = this.config.retryCount ?? 3;
@@ -279,7 +268,7 @@ export class JudgeEngine {
         }
         const jitter = Math.random() * 500;
         const delay = Math.min(1000 * Math.pow(2, attempt) + jitter, 10000);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
@@ -290,7 +279,7 @@ export class JudgeEngine {
   private async callOpenAIWithTimeout(
     prompt: { system: string; user: string },
     sample: ClassificationResult,
-    timeoutMs: number
+    timeoutMs: number,
   ): Promise<{ result: JudgedResult; tokensUsed: { input: number; output: number } }> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -307,7 +296,7 @@ export class JudgeEngine {
           ],
           response_format: { type: 'json_object' },
         },
-        { signal: controller.signal as AbortSignal }
+        { signal: controller.signal as AbortSignal },
       );
 
       clearTimeout(timeout);
@@ -343,7 +332,7 @@ export class JudgeEngine {
   private async callAnthropicWithTimeout(
     prompt: { system: string; user: string },
     sample: ClassificationResult,
-    timeoutMs: number
+    timeoutMs: number,
   ): Promise<{ result: JudgedResult; tokensUsed: { input: number; output: number } }> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -362,7 +351,7 @@ export class JudgeEngine {
             },
           ],
         },
-        { signal: controller.signal as AbortSignal }
+        { signal: controller.signal as AbortSignal },
       );
 
       clearTimeout(timeout);
@@ -400,7 +389,7 @@ export class JudgeEngine {
 
   private heuristicJudge(
     prompt: { system: string; user: string },
-    sample: ClassificationResult
+    sample: ClassificationResult,
   ): { result: JudgedResult; tokensUsed: { input: number; output: number } } {
     const isCorrect = sample.label === sample.predicted_label;
 

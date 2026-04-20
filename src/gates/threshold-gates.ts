@@ -16,7 +16,7 @@ import {
 export function evaluateThresholdGate(
   metrics: ClassificationMetrics,
   gate: RegressionGate,
-  context?: GateEvaluationContext
+  context?: GateEvaluationContext,
 ): GateResult {
   if (gate.type !== 'threshold') {
     return {

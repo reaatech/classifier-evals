@@ -92,7 +92,7 @@ function majorityVote(votes: JudgeVote[]): { correct: boolean; confidence: numbe
  */
 function weightedVote(
   votes: JudgeVote[],
-  reliabilities: Map<string, number>
+  reliabilities: Map<string, number>,
 ): { correct: boolean; confidence: number } {
   let totalWeight = 0;
   let correctWeight = 0;
@@ -131,7 +131,9 @@ function unanimousVote(votes: JudgeVote[]): { correct: boolean; confidence: numb
  * Calculate agreement rate among judges
  */
 function calculateAgreementRate(votes: JudgeVote[]): number {
-  if (votes.length < 2) {return 1.0;}
+  if (votes.length < 2) {
+    return 1.0;
+  }
 
   const correctCount = votes.filter((v) => v.result.judge_correct === true).length;
   const incorrectCount = votes.length - correctCount;
@@ -139,8 +141,7 @@ function calculateAgreementRate(votes: JudgeVote[]): number {
   // Agreement rate is the proportion of pairs that agree
   const totalPairs = (votes.length * (votes.length - 1)) / 2;
   const agreeingPairs =
-    (correctCount * (correctCount - 1)) / 2 +
-    (incorrectCount * (incorrectCount - 1)) / 2;
+    (correctCount * (correctCount - 1)) / 2 + (incorrectCount * (incorrectCount - 1)) / 2;
 
   return totalPairs > 0 ? agreeingPairs / totalPairs : 0;
 }
@@ -150,10 +151,12 @@ function calculateAgreementRate(votes: JudgeVote[]): number {
  */
 function generateConsensusReasoning(votes: JudgeVote[]): string {
   const reasonings = votes
-    .map(v => v.result.judge_reasoning)
+    .map((v) => v.result.judge_reasoning)
     .filter((r): r is string => r !== undefined && r !== '');
 
-  if (reasonings.length === 0) {return '';}
+  if (reasonings.length === 0) {
+    return '';
+  }
 
   // Take the most common reasoning pattern
   const reasoningCounts = new Map<string, number>();
@@ -162,9 +165,7 @@ function generateConsensusReasoning(votes: JudgeVote[]): string {
     reasoningCounts.set(normalized, (reasoningCounts.get(normalized) ?? 0) + 1);
   }
 
-  const sortedReasonings = Array.from(reasoningCounts.entries()).sort(
-    (a, b) => b[1] - a[1]
-  );
+  const sortedReasonings = Array.from(reasoningCounts.entries()).sort((a, b) => b[1] - a[1]);
 
   return sortedReasonings.map(([r]) => r).join('; ');
 }
@@ -175,12 +176,10 @@ function generateConsensusReasoning(votes: JudgeVote[]): string {
 export function executeConsensusVoting(
   sample: ClassificationResult,
   votes: JudgeVote[],
-  config: ConsensusConfig = DEFAULT_CONSENSUS_CONFIG
+  config: ConsensusConfig = DEFAULT_CONSENSUS_CONFIG,
 ): ConsensusResult {
   if (votes.length < config.minJudges) {
-    throw new Error(
-      `Insufficient judges: ${votes.length} < ${config.minJudges}`
-    );
+    throw new Error(`Insufficient judges: ${votes.length} < ${config.minJudges}`);
   }
 
   // Calculate agreement rate
@@ -230,11 +229,9 @@ export function executeBatchConsensusVoting(
     sample: ClassificationResult;
     votes: JudgeVote[];
   }>,
-  config: ConsensusConfig = DEFAULT_CONSENSUS_CONFIG
+  config: ConsensusConfig = DEFAULT_CONSENSUS_CONFIG,
 ): ConsensusResult[] {
-  return samplesWithVotes.map(({ sample, votes }) =>
-    executeConsensusVoting(sample, votes, config)
-  );
+  return samplesWithVotes.map(({ sample, votes }) => executeConsensusVoting(sample, votes, config));
 }
 
 /**
@@ -251,16 +248,15 @@ export function analyzeDisagreements(consensusResults: ConsensusResult[]): {
     votes: JudgeVote[];
   }>;
 } {
-  const disagreementCount = consensusResults.filter(r => r.isDisagreement).length;
+  const disagreementCount = consensusResults.filter((r) => r.isDisagreement).length;
   const avgAgreementRate =
-    consensusResults.reduce((sum, r) => sum + r.agreementRate, 0) /
-    consensusResults.length;
+    consensusResults.reduce((sum, r) => sum + r.agreementRate, 0) / consensusResults.length;
 
   // Find most disputed samples (lowest agreement rate)
   const mostDisputed = [...consensusResults]
     .sort((a, b) => a.agreementRate - b.agreementRate)
     .slice(0, 10)
-    .map(r => ({
+    .map((r) => ({
       sample: r.sample,
       agreementRate: r.agreementRate,
       votes: r.votes,
@@ -281,7 +277,7 @@ export function analyzeDisagreements(consensusResults: ConsensusResult[]): {
 export function optimizeJudgeCount(
   historicalResults: ConsensusResult[],
   targetAgreementRate: number = 0.8,
-  maxJudges: number = 10
+  maxJudges: number = 10,
 ): { optimalJudges: number; estimatedAccuracy: number; estimatedCost: number } {
   // Analyze how agreement rate changes with judge count
   const agreementByCount = new Map<number, number[]>();

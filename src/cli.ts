@@ -25,10 +25,7 @@ process.on('uncaughtException', (err) => {
 
 const program = new Command();
 
-program
-  .name('classifier-evals')
-  .description(pkg.description)
-  .version(pkg.version);
+program.name('classifier-evals').description(pkg.description).version(pkg.version);
 
 // Register commands
 evalCommand(program);

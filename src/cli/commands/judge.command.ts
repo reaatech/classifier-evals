@@ -28,7 +28,9 @@ let partialResults: { cost: number; processed: number } | null = null;
 
 function cleanup(): void {
   if (partialResults !== null) {
-    console.error(`\nInterrupted! Cost incurred: $${partialResults.cost.toFixed(4)} (${partialResults.processed} samples processed)`);
+    console.error(
+      `\nInterrupted! Cost incurred: $${partialResults.cost.toFixed(4)} (${partialResults.processed} samples processed)`,
+    );
   }
   process.exit(130);
 }
@@ -56,10 +58,14 @@ export function judgeCommand(program: Command): void {
           throw new Error(`Invalid budget: "${options.budget}". Must be a positive number.`);
         }
         if (Number.isNaN(concurrency) || concurrency < 1) {
-          throw new Error(`Invalid concurrency: "${options.concurrency}". Must be a positive integer.`);
+          throw new Error(
+            `Invalid concurrency: "${options.concurrency}". Must be a positive integer.`,
+          );
         }
         if (Number.isNaN(consensusCount) || consensusCount < 1) {
-          throw new Error(`Invalid consensus count: "${options.consensusCount}". Must be a positive integer.`);
+          throw new Error(
+            `Invalid consensus count: "${options.consensusCount}". Must be a positive integer.`,
+          );
         }
 
         console.error('Running LLM-as-judge...');
@@ -104,7 +110,9 @@ export function judgeCommand(program: Command): void {
         console.error(`  Samples Processed: ${result.samplesProcessed}`);
         console.error(`  Agreement Rate: ${(result.agreementRate * 100).toFixed(2)}%`);
         console.error(`  Total Cost: $${result.totalCost.toFixed(4)}`);
-        console.error(`  Average Cost/Sample: $${(result.totalCost / Math.max(result.samplesProcessed, 1)).toFixed(6)}`);
+        console.error(
+          `  Average Cost/Sample: $${(result.totalCost / Math.max(result.samplesProcessed, 1)).toFixed(6)}`,
+        );
         console.error(`  Budget Exceeded: ${result.budgetExceeded ? 'Yes' : 'No'}`);
 
         const output = JSON.stringify({ judge_result: result, eval_run: evalRun }, null, 2);
@@ -127,8 +135,8 @@ export function judgeCommand(program: Command): void {
 async function evaluateWithConsensus(
   judge: JudgeEngine,
   samples: ClassificationResult[],
-  consensusCount: number
-) : Promise<ConsensusJudgeResult> {
+  consensusCount: number,
+): Promise<ConsensusJudgeResult> {
   const samplesWithVotes = [];
 
   for (const sample of samples) {
@@ -168,7 +176,7 @@ async function evaluateWithConsensus(
         sample: samples[sampleIndex]!,
         result: vote.result,
         tokensUsed: { input: 0, output: 0 },
-      }))
+      })),
     ),
     totalCost: breakdown.totalCost,
     totalTokens: {

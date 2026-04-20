@@ -6,9 +6,7 @@ import { exportToHtml } from '../../exporters/html-exporter.js';
 import { exportToJson } from '../../exporters/json-exporter.js';
 import { loadEvalRunFromFile } from '../../utils/eval-run.js';
 
-export async function generateReportTool(
-  args: Record<string, unknown>
-): Promise<CallToolResult> {
+export async function generateReportTool(args: Record<string, unknown>): Promise<CallToolResult> {
   const format = (args.format as string | undefined) ?? 'html';
   const evalRun =
     typeof args.eval_results === 'string'
@@ -23,9 +21,7 @@ export async function generateReportTool(
   }
 
   const rendered =
-    format === 'json'
-      ? exportToJson({ evalRun }).json ?? ''
-      : exportToHtml(evalRun).html;
+    format === 'json' ? (exportToJson({ evalRun }).json ?? '') : exportToHtml(evalRun).html;
 
   return {
     content: [{ type: 'text', text: rendered }],

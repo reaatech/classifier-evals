@@ -31,7 +31,7 @@ export function evalCommand(program: Command): void {
           throw new Error(`Invalid format "${options.format}". Supported: json, html`);
         }
         console.error(`Loading dataset from: ${options.dataset}`);
-        
+
         // Load dataset
         const dataset = await loadDataset(options.dataset);
         console.error(`Loaded ${dataset.samples.length} samples`);
@@ -47,7 +47,7 @@ export function evalCommand(program: Command): void {
         const { confusion_matrix: cm, metrics } = evalRun;
 
         console.error(`\nConfusion Matrix (${cm.labels.length}x${cm.labels.length}):`);
-        console.error(cm.matrix.map(row => row.join('\t')).join('\n'));
+        console.error(cm.matrix.map((row) => row.join('\t')).join('\n'));
 
         console.error(`\nOverall Metrics:`);
         console.error(`  Accuracy: ${(metrics.accuracy * 100).toFixed(2)}%`);

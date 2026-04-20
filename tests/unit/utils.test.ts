@@ -43,9 +43,9 @@ describe('utility helpers', () => {
     });
 
     expect(evalRun.dataset_name).toBe('samples.jsonl');
-    expect(
-      (evalRun.metadata?.distribution_metrics as { unknown_rate: number }).unknown_rate
-    ).toBe(0.5);
+    expect((evalRun.metadata?.distribution_metrics as { unknown_rate: number }).unknown_rate).toBe(
+      0.5,
+    );
 
     const gate = normalizeRegressionGate({
       name: 'baseline',
@@ -91,13 +91,33 @@ describe('utility helpers', () => {
 
   it('builds eval run with judgeCost and gate results', () => {
     const evalRun = createEvalRunFromSamples({
-      samples: [
-        { text: 'hello', label: 'greet', predicted_label: 'greet', confidence: 0.9 },
-      ],
+      samples: [{ text: 'hello', label: 'greet', predicted_label: 'greet', confidence: 0.9 }],
       judgeCost: 0.05,
       gateResults: [
-        { gate: { name: 'acc', type: 'threshold', metric: 'accuracy', operator: '>=', threshold: 0.8 }, passed: true, message: 'ok', failures: [] },
-        { gate: { name: 'f1', type: 'threshold', metric: 'f1_macro', operator: '>=', threshold: 0.8 }, passed: false, message: 'low', failures: [] },
+        {
+          gate: {
+            name: 'acc',
+            type: 'threshold',
+            metric: 'accuracy',
+            operator: '>=',
+            threshold: 0.8,
+          },
+          passed: true,
+          message: 'ok',
+          failures: [],
+        },
+        {
+          gate: {
+            name: 'f1',
+            type: 'threshold',
+            metric: 'f1_macro',
+            operator: '>=',
+            threshold: 0.8,
+          },
+          passed: false,
+          message: 'low',
+          failures: [],
+        },
       ],
     });
     expect(evalRun.judge_cost).toBe(0.05);
@@ -108,13 +128,16 @@ describe('utility helpers', () => {
   it('loads regression gates from YAML with top-level array', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gates-'));
     const filePath = path.join(tempDir, 'gates.yaml');
-    fs.writeFileSync(filePath, [
-      '- name: accuracy-gate',
-      '  type: threshold',
-      '  metric: accuracy',
-      '  operator: ">="',
-      '  threshold: 0.85',
-    ].join('\n'));
+    fs.writeFileSync(
+      filePath,
+      [
+        '- name: accuracy-gate',
+        '  type: threshold',
+        '  metric: accuracy',
+        '  operator: ">="',
+        '  threshold: 0.85',
+      ].join('\n'),
+    );
 
     const gates = loadRegressionGatesFromFile(filePath);
     expect(gates).toHaveLength(1);
@@ -124,14 +147,17 @@ describe('utility helpers', () => {
   it('loads regression gates from YAML with gates key', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gates-'));
     const filePath = path.join(tempDir, 'gates.yaml');
-    fs.writeFileSync(filePath, [
-      'gates:',
-      '  - name: f1-gate',
-      '    type: threshold',
-      '    metric: f1_macro',
-      '    operator: ">="',
-      '    threshold: 0.8',
-    ].join('\n'));
+    fs.writeFileSync(
+      filePath,
+      [
+        'gates:',
+        '  - name: f1-gate',
+        '    type: threshold',
+        '    metric: f1_macro',
+        '    operator: ">="',
+        '    threshold: 0.8',
+      ].join('\n'),
+    );
 
     const gates = loadRegressionGatesFromFile(filePath);
     expect(gates).toHaveLength(1);
@@ -149,9 +175,7 @@ describe('utility helpers', () => {
   it('handles datasetName fallback when datasetPath is empty', () => {
     const evalRun = createEvalRunFromSamples({
       datasetPath: '',
-      samples: [
-        { text: 'hello', label: 'greet', predicted_label: 'greet', confidence: 0.9 },
-      ],
+      samples: [{ text: 'hello', label: 'greet', predicted_label: 'greet', confidence: 0.9 }],
     });
     expect(evalRun.dataset_name).toBeUndefined();
   });

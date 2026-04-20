@@ -7,12 +7,7 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import {
-  Counter,
-  Histogram,
-  Gauge,
-  Meter,
-} from '@opentelemetry/api';
+import { Counter, Histogram, Gauge, Meter } from '@opentelemetry/api';
 
 const METER_NAME = 'classifier-evals';
 
@@ -32,7 +27,9 @@ let f1MacroGauge: Gauge | undefined;
  * Initializes the metrics system
  */
 export function initMetrics(exporter?: OTLPMetricExporter): void {
-  if (meterProvider) { return; }
+  if (meterProvider) {
+    return;
+  }
 
   const readers: MetricReader[] = [];
 

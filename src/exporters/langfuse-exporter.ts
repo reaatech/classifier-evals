@@ -42,7 +42,7 @@ async function sendToLangfuse(
   baseUrl: string,
   publicKey: string,
   secretKey: string,
-  events: LangfuseEvent[]
+  events: LangfuseEvent[],
 ): Promise<void> {
   const url = `${baseUrl}/api/public/ingestion`;
   const authHeader = Buffer.from(`${publicKey}:${secretKey}`).toString('base64');
@@ -65,7 +65,9 @@ async function sendToLangfuse(
 
     if (!response.ok) {
       const body = await response.text().catch(() => '');
-      throw new Error(`Langfuse API error: ${response.status} ${response.statusText}${body !== '' ? ` - ${body}` : ''}`);
+      throw new Error(
+        `Langfuse API error: ${response.status} ${response.statusText}${body !== '' ? ` - ${body}` : ''}`,
+      );
     }
   } finally {
     clearTimeout(timeout);
@@ -89,10 +91,7 @@ export async function exportToLangfuse(input: LangfuseExportInput): Promise<Expo
       secretKey === undefined ||
       secretKey === ''
     ) {
-      logger.warn(
-        { runId: evalRun.run_id },
-        'Langfuse keys not configured, export skipped'
-      );
+      logger.warn({ runId: evalRun.run_id }, 'Langfuse keys not configured, export skipped');
 
       return {
         success: false,
@@ -139,7 +138,7 @@ export async function exportToLangfuse(input: LangfuseExportInput): Promise<Expo
         baseUrl,
         traceName,
       },
-      'Langfuse export completed'
+      'Langfuse export completed',
     );
 
     return {
@@ -155,7 +154,7 @@ export async function exportToLangfuse(input: LangfuseExportInput): Promise<Expo
         runId: evalRun.run_id,
         error: err.message,
       },
-      'Langfuse export failed'
+      'Langfuse export failed',
     );
 
     return {

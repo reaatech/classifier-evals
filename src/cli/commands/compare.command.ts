@@ -38,10 +38,7 @@ export function compareCommand(program: Command): void {
         console.error(`  Summary: ${summary}`);
 
         if (options.output !== undefined) {
-          writeFileSync(
-            options.output,
-            JSON.stringify({ comparison, summary }, null, 2)
-          );
+          writeFileSync(options.output, JSON.stringify({ comparison, summary }, null, 2));
           console.error(`\nComparison written to: ${options.output}`);
         } else {
           process.stdout.write(JSON.stringify({ comparison, summary }, null, 2) + '\n');

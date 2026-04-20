@@ -11,7 +11,7 @@ export interface GateEvaluationContext {
 export function getMetricValue(
   metrics: ClassificationMetrics,
   metricName: string | undefined,
-  context?: GateEvaluationContext
+  context?: GateEvaluationContext,
 ): number | undefined {
   if (metricName === undefined || metricName === '') {
     return undefined;
@@ -53,11 +53,7 @@ export function getMetricValue(
   return typeof metadataValue === 'number' ? metadataValue : undefined;
 }
 
-export function compareThreshold(
-  actual: number,
-  expected: number,
-  operator: string
-): boolean {
+export function compareThreshold(actual: number, expected: number, operator: string): boolean {
   switch (operator) {
     case '>=':
       return actual >= expected;

@@ -21,7 +21,7 @@ function createTempDir(): string {
 function generateSamples(
   count: number,
   errorEvery: number,
-  unknownEvery: number
+  unknownEvery: number,
 ): ClassificationResult[] {
   const labels = ['billing', 'shipping', 'returns', 'account'];
 
@@ -50,10 +50,7 @@ function generateSamples(
   });
 }
 
-function writeJsonlDataset(
-  filePath: string,
-  samples: ClassificationResult[]
-): void {
+function writeJsonlDataset(filePath: string, samples: ClassificationResult[]): void {
   const content = samples.map((sample) => JSON.stringify(sample)).join('\n');
   writeFileSync(filePath, `${content}\n`, 'utf8');
 }
@@ -85,16 +82,14 @@ function createGateSet(baselinePath: string): RegressionGate[] {
 
 function measureCorePipeline(
   samples: ClassificationResult[],
-  baselinePath: string
+  baselinePath: string,
 ): { runtimeMs: number; accuracy: number; totalSamples: number } {
   const start = performance.now();
   const evalRun = createEvalRunFromSamples({ samples });
   const engine = createGateEngine({ cacheResults: false });
-  const gateResult = engine.evaluateGates(
-    evalRun.metrics,
-    createGateSet(baselinePath),
-    { evalRun }
-  );
+  const gateResult = engine.evaluateGates(evalRun.metrics, createGateSet(baselinePath), {
+    evalRun,
+  });
   const runtimeMs = performance.now() - start;
 
   expect(gateResult.passed).toBe(true);
@@ -127,7 +122,7 @@ describe('evaluation performance', () => {
     writeFileSync(
       baselinePath,
       JSON.stringify(createEvalRunFromSamples({ samples: baselineSamples }), null, 2),
-      'utf8'
+      'utf8',
     );
 
     const overallStart = performance.now();
@@ -147,11 +142,7 @@ describe('evaluation performance', () => {
 
     const gatesStart = performance.now();
     const engine = createGateEngine({ cacheResults: false });
-    const gateResult = engine.evaluateGates(
-      metrics,
-      createGateSet(baselinePath),
-      { evalRun }
-    );
+    const gateResult = engine.evaluateGates(metrics, createGateSet(baselinePath), { evalRun });
     const gatesRuntimeMs = performance.now() - gatesStart;
     const totalRuntimeMs = performance.now() - overallStart;
 
@@ -176,12 +167,12 @@ describe('evaluation performance', () => {
     writeFileSync(
       smallBaselinePath,
       JSON.stringify(createEvalRunFromSamples({ samples: generateSamples(10000, 8, 40) }), null, 2),
-      'utf8'
+      'utf8',
     );
     writeFileSync(
       largeBaselinePath,
       JSON.stringify(createEvalRunFromSamples({ samples: generateSamples(25000, 8, 40) }), null, 2),
-      'utf8'
+      'utf8',
     );
 
     const smallRun = measureCorePipeline(smallSamples, smallBaselinePath);

@@ -4,11 +4,27 @@
 
 const PII_PATTERNS: { name: string; regex: RegExp; replacement: string }[] = [
   // Order matters: longer/more-specific patterns first to avoid partial matches
-  { name: 'credit_card', regex: /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g, replacement: '[CARD_REDACTED]' },
-  { name: 'email', regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, replacement: '[EMAIL_REDACTED]' },
-  { name: 'phone', regex: /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, replacement: '[PHONE_REDACTED]' },
+  {
+    name: 'credit_card',
+    regex: /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g,
+    replacement: '[CARD_REDACTED]',
+  },
+  {
+    name: 'email',
+    regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+    replacement: '[EMAIL_REDACTED]',
+  },
+  {
+    name: 'phone',
+    regex: /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+    replacement: '[PHONE_REDACTED]',
+  },
   { name: 'ssn', regex: /\b\d{3}-\d{2}-\d{4}\b/g, replacement: '[SSN_REDACTED]' },
-  { name: 'ip_address', regex: /\b(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\b/g, replacement: '[IP_REDACTED]' },
+  {
+    name: 'ip_address',
+    regex: /\b(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\b/g,
+    replacement: '[IP_REDACTED]',
+  },
 ];
 
 /**
@@ -28,7 +44,10 @@ export function redactPII(text: string): string {
  */
 export function sanitizeForPrompt(text: string): string {
   return text
-    .replace(/\b(ignore|disregard|forget|override)\s+(all\s+)?(previous|above|earlier)\s+(instructions?|directions?|prompts?)/gi, '[INSTRUCTION_REMOVED]')
+    .replace(
+      /\b(ignore|disregard|forget|override)\s+(all\s+)?(previous|above|earlier)\s+(instructions?|directions?|prompts?)/gi,
+      '[INSTRUCTION_REMOVED]',
+    )
     .replace(/\b(return|respond|reply)\s+(with|only|just)\s*\{/gi, '[INSTRUCTION_REMOVED]')
     .replace(/\bsystem\s*:\s*/gi, '[PREFIX_REMOVED]')
     .replace(/\bassistant\s*:\s*/gi, '[PREFIX_REMOVED]')

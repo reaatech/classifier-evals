@@ -34,7 +34,7 @@ export async function runEvalTool(args: Record<string, unknown>): Promise<CallTo
         samples: evalRun.total_samples,
         accuracy: evalRun.metrics.accuracy,
       },
-      'Evaluation completed'
+      'Evaluation completed',
     );
 
     return {

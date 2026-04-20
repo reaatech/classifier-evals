@@ -25,10 +25,33 @@ function createMockEvalRun(overrides: Partial<EvalRun> = {}): EvalRun {
     total_samples: 100,
     confusion_matrix: {
       labels: ['cat', 'dog'],
-      matrix: [[40, 10], [5, 45]],
+      matrix: [
+        [40, 10],
+        [5, 45],
+      ],
       per_class: [
-        { label: 'cat', true_positives: 40, false_positives: 5, false_negatives: 10, true_negatives: 45, precision: 0.8, recall: 0.8, f1: 0.8, support: 50 },
-        { label: 'dog', true_positives: 45, false_positives: 10, false_negatives: 5, true_negatives: 40, precision: 0.9, recall: 0.9, f1: 0.9, support: 50 },
+        {
+          label: 'cat',
+          true_positives: 40,
+          false_positives: 5,
+          false_negatives: 10,
+          true_negatives: 45,
+          precision: 0.8,
+          recall: 0.8,
+          f1: 0.8,
+          support: 50,
+        },
+        {
+          label: 'dog',
+          true_positives: 45,
+          false_positives: 10,
+          false_negatives: 5,
+          true_negatives: 40,
+          precision: 0.9,
+          recall: 0.9,
+          f1: 0.9,
+          support: 50,
+        },
       ],
     },
     metrics: {
@@ -67,11 +90,11 @@ describe('Dashboard', () => {
     });
 
     it('should include cost when available', () => {
-      const run = createMockEvalRun({ judge_cost: 0.50, total_samples: 100 });
+      const run = createMockEvalRun({ judge_cost: 0.5, total_samples: 100 });
       const point = evalRunToTrendDataPoint(run);
 
       expect(point.cost).toBeDefined();
-      expect(point.cost?.total).toBe(0.50);
+      expect(point.cost?.total).toBe(0.5);
       expect(point.cost?.per_sample).toBe(0.005);
     });
 
@@ -95,8 +118,28 @@ describe('Dashboard', () => {
   describe('calculateTrendStatistics', () => {
     it('should return null for insufficient data points', () => {
       const dataPoints: TrendDataPoint[] = [
-        { timestamp: '2024-01-01', runId: '1', metrics: { accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8, precision_macro: 0.8, recall_macro: 0.8 } },
-        { timestamp: '2024-01-02', runId: '2', metrics: { accuracy: 0.85, f1_macro: 0.85, f1_micro: 0.85, precision_macro: 0.85, recall_macro: 0.85 } },
+        {
+          timestamp: '2024-01-01',
+          runId: '1',
+          metrics: {
+            accuracy: 0.8,
+            f1_macro: 0.8,
+            f1_micro: 0.8,
+            precision_macro: 0.8,
+            recall_macro: 0.8,
+          },
+        },
+        {
+          timestamp: '2024-01-02',
+          runId: '2',
+          metrics: {
+            accuracy: 0.85,
+            f1_macro: 0.85,
+            f1_micro: 0.85,
+            precision_macro: 0.85,
+            recall_macro: 0.85,
+          },
+        },
       ];
 
       const result = calculateTrendStatistics(dataPoints, 'accuracy', {
@@ -109,9 +152,39 @@ describe('Dashboard', () => {
 
     it('should calculate statistics correctly', () => {
       const dataPoints: TrendDataPoint[] = [
-        { timestamp: '2024-01-01', runId: '1', metrics: { accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8, precision_macro: 0.8, recall_macro: 0.8 } },
-        { timestamp: '2024-01-02', runId: '2', metrics: { accuracy: 0.85, f1_macro: 0.85, f1_micro: 0.85, precision_macro: 0.85, recall_macro: 0.85 } },
-        { timestamp: '2024-01-03', runId: '3', metrics: { accuracy: 0.9, f1_macro: 0.9, f1_micro: 0.9, precision_macro: 0.9, recall_macro: 0.9 } },
+        {
+          timestamp: '2024-01-01',
+          runId: '1',
+          metrics: {
+            accuracy: 0.8,
+            f1_macro: 0.8,
+            f1_micro: 0.8,
+            precision_macro: 0.8,
+            recall_macro: 0.8,
+          },
+        },
+        {
+          timestamp: '2024-01-02',
+          runId: '2',
+          metrics: {
+            accuracy: 0.85,
+            f1_macro: 0.85,
+            f1_micro: 0.85,
+            precision_macro: 0.85,
+            recall_macro: 0.85,
+          },
+        },
+        {
+          timestamp: '2024-01-03',
+          runId: '3',
+          metrics: {
+            accuracy: 0.9,
+            f1_macro: 0.9,
+            f1_micro: 0.9,
+            precision_macro: 0.9,
+            recall_macro: 0.9,
+          },
+        },
       ];
 
       const result = calculateTrendStatistics(dataPoints, 'accuracy');
@@ -125,9 +198,39 @@ describe('Dashboard', () => {
 
     it('should detect improving trend', () => {
       const dataPoints: TrendDataPoint[] = [
-        { timestamp: '2024-01-01', runId: '1', metrics: { accuracy: 0.7, f1_macro: 0.7, f1_micro: 0.7, precision_macro: 0.7, recall_macro: 0.7 } },
-        { timestamp: '2024-01-02', runId: '2', metrics: { accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8, precision_macro: 0.8, recall_macro: 0.8 } },
-        { timestamp: '2024-01-03', runId: '3', metrics: { accuracy: 0.9, f1_macro: 0.9, f1_micro: 0.9, precision_macro: 0.9, recall_macro: 0.9 } },
+        {
+          timestamp: '2024-01-01',
+          runId: '1',
+          metrics: {
+            accuracy: 0.7,
+            f1_macro: 0.7,
+            f1_micro: 0.7,
+            precision_macro: 0.7,
+            recall_macro: 0.7,
+          },
+        },
+        {
+          timestamp: '2024-01-02',
+          runId: '2',
+          metrics: {
+            accuracy: 0.8,
+            f1_macro: 0.8,
+            f1_micro: 0.8,
+            precision_macro: 0.8,
+            recall_macro: 0.8,
+          },
+        },
+        {
+          timestamp: '2024-01-03',
+          runId: '3',
+          metrics: {
+            accuracy: 0.9,
+            f1_macro: 0.9,
+            f1_micro: 0.9,
+            precision_macro: 0.9,
+            recall_macro: 0.9,
+          },
+        },
       ];
 
       const result = calculateTrendStatistics(dataPoints, 'accuracy');
@@ -137,9 +240,39 @@ describe('Dashboard', () => {
 
     it('should detect declining trend', () => {
       const dataPoints: TrendDataPoint[] = [
-        { timestamp: '2024-01-01', runId: '1', metrics: { accuracy: 0.9, f1_macro: 0.9, f1_micro: 0.9, precision_macro: 0.9, recall_macro: 0.9 } },
-        { timestamp: '2024-01-02', runId: '2', metrics: { accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8, precision_macro: 0.8, recall_macro: 0.8 } },
-        { timestamp: '2024-01-03', runId: '3', metrics: { accuracy: 0.7, f1_macro: 0.7, f1_micro: 0.7, precision_macro: 0.7, recall_macro: 0.7 } },
+        {
+          timestamp: '2024-01-01',
+          runId: '1',
+          metrics: {
+            accuracy: 0.9,
+            f1_macro: 0.9,
+            f1_micro: 0.9,
+            precision_macro: 0.9,
+            recall_macro: 0.9,
+          },
+        },
+        {
+          timestamp: '2024-01-02',
+          runId: '2',
+          metrics: {
+            accuracy: 0.8,
+            f1_macro: 0.8,
+            f1_micro: 0.8,
+            precision_macro: 0.8,
+            recall_macro: 0.8,
+          },
+        },
+        {
+          timestamp: '2024-01-03',
+          runId: '3',
+          metrics: {
+            accuracy: 0.7,
+            f1_macro: 0.7,
+            f1_micro: 0.7,
+            precision_macro: 0.7,
+            recall_macro: 0.7,
+          },
+        },
       ];
 
       const result = calculateTrendStatistics(dataPoints, 'accuracy');
@@ -170,9 +303,18 @@ describe('Dashboard', () => {
 
     it('should identify best and worst runs', () => {
       const runs: EvalRun[] = [
-        createMockEvalRun({ run_id: 'worst', metrics: { ...createMockEvalRun().metrics, accuracy: 0.7 } }),
-        createMockEvalRun({ run_id: 'best', metrics: { ...createMockEvalRun().metrics, accuracy: 0.95 } }),
-        createMockEvalRun({ run_id: 'middle', metrics: { ...createMockEvalRun().metrics, accuracy: 0.85 } }),
+        createMockEvalRun({
+          run_id: 'worst',
+          metrics: { ...createMockEvalRun().metrics, accuracy: 0.7 },
+        }),
+        createMockEvalRun({
+          run_id: 'best',
+          metrics: { ...createMockEvalRun().metrics, accuracy: 0.95 },
+        }),
+        createMockEvalRun({
+          run_id: 'middle',
+          metrics: { ...createMockEvalRun().metrics, accuracy: 0.85 },
+        }),
       ];
 
       const summary = generateDashboardSummary(runs);
@@ -214,9 +356,45 @@ describe('Dashboard', () => {
 
   describe('Filtering', () => {
     const dataPoints: TrendDataPoint[] = [
-      { timestamp: '2024-01-15', runId: '1', model: 'model-a', datasetName: 'dataset-1', metrics: { accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8, precision_macro: 0.8, recall_macro: 0.8 } },
-      { timestamp: '2024-01-10', runId: '2', model: 'model-b', datasetName: 'dataset-2', metrics: { accuracy: 0.85, f1_macro: 0.85, f1_micro: 0.85, precision_macro: 0.85, recall_macro: 0.85 } },
-      { timestamp: new Date().toISOString(), runId: '3', model: 'model-a', datasetName: 'dataset-1', metrics: { accuracy: 0.9, f1_macro: 0.9, f1_micro: 0.9, precision_macro: 0.9, recall_macro: 0.9 } },
+      {
+        timestamp: '2024-01-15',
+        runId: '1',
+        model: 'model-a',
+        datasetName: 'dataset-1',
+        metrics: {
+          accuracy: 0.8,
+          f1_macro: 0.8,
+          f1_micro: 0.8,
+          precision_macro: 0.8,
+          recall_macro: 0.8,
+        },
+      },
+      {
+        timestamp: '2024-01-10',
+        runId: '2',
+        model: 'model-b',
+        datasetName: 'dataset-2',
+        metrics: {
+          accuracy: 0.85,
+          f1_macro: 0.85,
+          f1_micro: 0.85,
+          precision_macro: 0.85,
+          recall_macro: 0.85,
+        },
+      },
+      {
+        timestamp: new Date().toISOString(),
+        runId: '3',
+        model: 'model-a',
+        datasetName: 'dataset-1',
+        metrics: {
+          accuracy: 0.9,
+          f1_macro: 0.9,
+          f1_micro: 0.9,
+          precision_macro: 0.9,
+          recall_macro: 0.9,
+        },
+      },
     ];
 
     it('should filter by date range', () => {
@@ -229,23 +407,32 @@ describe('Dashboard', () => {
     it('should filter by model', () => {
       const filtered = filterByModel(dataPoints, 'model-a');
       expect(filtered).toHaveLength(2);
-      expect(filtered.every(dp => dp.model === 'model-a')).toBe(true);
+      expect(filtered.every((dp) => dp.model === 'model-a')).toBe(true);
     });
 
     it('should filter by dataset', () => {
       const filtered = filterByDataset(dataPoints, 'dataset-1');
       expect(filtered).toHaveLength(2);
-      expect(filtered.every(dp => dp.datasetName === 'dataset-1')).toBe(true);
+      expect(filtered.every((dp) => dp.datasetName === 'dataset-1')).toBe(true);
     });
   });
 
   describe('compareEvalRuns', () => {
     it('should compare baseline and candidate runs', () => {
       const baselineRuns: EvalRun[] = [
-        createMockEvalRun({ metrics: { ...createMockEvalRun().metrics, accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8 } }),
+        createMockEvalRun({
+          metrics: { ...createMockEvalRun().metrics, accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8 },
+        }),
       ];
       const candidateRuns: EvalRun[] = [
-        createMockEvalRun({ metrics: { ...createMockEvalRun().metrics, accuracy: 0.85, f1_macro: 0.85, f1_micro: 0.85 } }),
+        createMockEvalRun({
+          metrics: {
+            ...createMockEvalRun().metrics,
+            accuracy: 0.85,
+            f1_macro: 0.85,
+            f1_micro: 0.85,
+          },
+        }),
       ];
 
       const comparison = compareEvalRuns(baselineRuns, candidateRuns);
@@ -270,8 +457,32 @@ describe('Dashboard', () => {
 
   describe('exportDashboardData', () => {
     const dataPoints: TrendDataPoint[] = [
-      { timestamp: '2024-01-01', runId: '1', datasetName: 'test', model: 'm1', metrics: { accuracy: 0.8, f1_macro: 0.8, f1_micro: 0.8, precision_macro: 0.8, recall_macro: 0.8 } },
-      { timestamp: '2024-01-02', runId: '2', datasetName: 'test', model: 'm1', metrics: { accuracy: 0.85, f1_macro: 0.85, f1_micro: 0.85, precision_macro: 0.85, recall_macro: 0.85 } },
+      {
+        timestamp: '2024-01-01',
+        runId: '1',
+        datasetName: 'test',
+        model: 'm1',
+        metrics: {
+          accuracy: 0.8,
+          f1_macro: 0.8,
+          f1_micro: 0.8,
+          precision_macro: 0.8,
+          recall_macro: 0.8,
+        },
+      },
+      {
+        timestamp: '2024-01-02',
+        runId: '2',
+        datasetName: 'test',
+        model: 'm1',
+        metrics: {
+          accuracy: 0.85,
+          f1_macro: 0.85,
+          f1_micro: 0.85,
+          precision_macro: 0.85,
+          recall_macro: 0.85,
+        },
+      },
     ];
 
     it('should export as JSON', () => {

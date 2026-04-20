@@ -40,21 +40,21 @@ describe('Confusion Matrix', () => {
     const cm = buildConfusionMatrix(samples);
 
     expect(cm.per_class.length).toBe(3);
-    
+
     // Verify the actual values from our implementation
-    const catMetrics = cm.per_class.find(c => c.label === 'cat');
+    const catMetrics = cm.per_class.find((c) => c.label === 'cat');
     // cat: TP=1, FP=0 (nothing predicted as cat incorrectly), FN=1 (one cat predicted as dog)
     // => precision=1.0, recall=0.5
     expect(catMetrics?.precision).toBeCloseTo(1.0);
     expect(catMetrics?.recall).toBeCloseTo(0.5);
-    
-    const dogMetrics = cm.per_class.find(c => c.label === 'dog');
+
+    const dogMetrics = cm.per_class.find((c) => c.label === 'dog');
     // dog: TP=1, FP=1 (cat predicted as dog), FN=1 (dog predicted as bird)
     // => precision=0.5, recall=0.5
     expect(dogMetrics?.precision).toBeCloseTo(0.5);
     expect(dogMetrics?.recall).toBeCloseTo(0.5);
-    
-    const birdMetrics = cm.per_class.find(c => c.label === 'bird');
+
+    const birdMetrics = cm.per_class.find((c) => c.label === 'bird');
     // bird: TP=1, FP=1 (dog predicted as bird), FN=0
     // => precision=0.5, recall=1.0
     expect(birdMetrics?.precision).toBeCloseTo(0.5);
@@ -135,9 +135,7 @@ describe('Classification Metrics', () => {
     const normalizedPred = normalizeConfusionMatrix(cm, 'pred');
 
     // Verify column-wise normalization
-    const colSums = cm.matrix[0]!.map((_, j) =>
-      cm.matrix.reduce((sum, row) => sum + row[j]!, 0)
-    );
+    const colSums = cm.matrix[0]!.map((_, j) => cm.matrix.reduce((sum, row) => sum + row[j]!, 0));
 
     for (let j = 0; j < cm.labels.length; j++) {
       if (colSums[j]! > 0) {
@@ -156,9 +154,39 @@ describe('Classification Metrics', () => {
         [0, 0, 3],
       ],
       per_class: [
-        { label: 'a', true_positives: 0, false_positives: 0, false_negatives: 0, true_negatives: 6, precision: 0, recall: 0, f1: 0, support: 0 },
-        { label: 'b', true_positives: 2, false_positives: 1, false_negatives: 0, true_negatives: 3, precision: 0.67, recall: 1, f1: 0.8, support: 3 },
-        { label: 'c', true_positives: 3, false_positives: 0, false_negatives: 0, true_negatives: 3, precision: 1, recall: 1, f1: 1, support: 3 },
+        {
+          label: 'a',
+          true_positives: 0,
+          false_positives: 0,
+          false_negatives: 0,
+          true_negatives: 6,
+          precision: 0,
+          recall: 0,
+          f1: 0,
+          support: 0,
+        },
+        {
+          label: 'b',
+          true_positives: 2,
+          false_positives: 1,
+          false_negatives: 0,
+          true_negatives: 3,
+          precision: 0.67,
+          recall: 1,
+          f1: 0.8,
+          support: 3,
+        },
+        {
+          label: 'c',
+          true_positives: 3,
+          false_positives: 0,
+          false_negatives: 0,
+          true_negatives: 3,
+          precision: 1,
+          recall: 1,
+          f1: 1,
+          support: 3,
+        },
       ],
     };
 

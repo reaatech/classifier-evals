@@ -8,11 +8,7 @@ const TRACER_NAME = 'classifier-evals';
 /**
  * Creates a span for an evaluation run
  */
-export function startEvalSpan(
-  dataset: string,
-  samples: number,
-  model?: string
-): Span {
+export function startEvalSpan(dataset: string, samples: number, model?: string): Span {
   const tracer = trace.getTracer(TRACER_NAME);
   const span = tracer.startSpan('eval.run');
   span.setAttributes({
@@ -89,10 +85,7 @@ export function endSpan(span: Span, error?: Error): void {
 /**
  * Executes a function within a span
  */
-export function withSpan<T>(
-  span: Span,
-  fn: () => T
-): T {
+export function withSpan<T>(span: Span, fn: () => T): T {
   try {
     const result = fn();
     if (result instanceof Promise) {
@@ -104,7 +97,7 @@ export function withSpan<T>(
         (error) => {
           endSpan(span, error);
           throw error;
-        }
+        },
       ) as T;
     }
     endSpan(span);

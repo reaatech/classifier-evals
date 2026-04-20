@@ -20,9 +20,7 @@ export interface JsonExportInput {
   options?: JsonExportOptions;
 }
 
-export function exportToJson(
-  input: JsonExportInput
-): ExportResult {
+export function exportToJson(input: JsonExportInput): ExportResult {
   const { evalRun, options = {} } = input;
   const {
     includeSamples = false,
@@ -87,7 +85,7 @@ export function exportToJson(
         runId: evalRun.run_id,
         payloadSize: json.length,
       },
-      'JSON export completed'
+      'JSON export completed',
     );
 
     return {
@@ -104,7 +102,7 @@ export function exportToJson(
         runId: evalRun.run_id,
         error: err.message,
       },
-      'JSON export failed'
+      'JSON export failed',
     );
 
     return {

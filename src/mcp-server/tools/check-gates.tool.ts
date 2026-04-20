@@ -21,7 +21,7 @@ export async function checkGatesTool(args: Record<string, unknown>): Promise<Cal
       ? loadRegressionGatesFromFile(args.gate_config)
       : Array.isArray(args.gate_config)
         ? (args.gate_config as Record<string, unknown>[]).map((gate) =>
-            normalizeRegressionGate(gate)
+            normalizeRegressionGate(gate),
           )
         : undefined;
 
@@ -43,11 +43,9 @@ export async function checkGatesTool(args: Record<string, unknown>): Promise<Cal
           ...gate,
           baseline_path:
             gate.baseline_path ??
-            (typeof args.baseline_results === 'string'
-              ? args.baseline_results
-              : undefined),
+            (typeof args.baseline_results === 'string' ? args.baseline_results : undefined),
         }
-      : gate
+      : gate,
   );
 
   try {
@@ -58,7 +56,10 @@ export async function checkGatesTool(args: Record<string, unknown>): Promise<Cal
 
     const passed = evaluationResult.passed;
     const summary = evaluationResult.gateResults
-      .map((r) => `${r.passed ? '✅' : '❌'} ${r.gate.name}: ${r.passed ? 'PASSED' : 'FAILED'} - ${r.message ?? ''}`)
+      .map(
+        (r) =>
+          `${r.passed ? '✅' : '❌'} ${r.gate.name}: ${r.passed ? 'PASSED' : 'FAILED'} - ${r.message ?? ''}`,
+      )
       .join('\n');
 
     logger.info(
@@ -67,7 +68,7 @@ export async function checkGatesTool(args: Record<string, unknown>): Promise<Cal
         count: evaluationResult.totalCount,
         baseline: baselineResults?.run_id,
       },
-      'Gate check completed'
+      'Gate check completed',
     );
 
     return {

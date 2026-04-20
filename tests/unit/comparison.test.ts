@@ -57,7 +57,7 @@ describe('comparePersistedEvalRuns', () => {
       samples.map((sample, index) => ({
         ...sample,
         predicted_label: candidatePredictions[index]!,
-      }))
+      })),
     );
     expect(rawComparison.per_class_comparison).toHaveLength(3);
     expect(calculateEffectSize([0.5, 0.6], [0.7, 0.8])).toBeGreaterThan(0);

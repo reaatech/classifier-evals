@@ -42,10 +42,12 @@ export function generateGitHubOutput(results: GateResult[]): CIOutput {
     return `${status} ${r.gate.name}: ${r.passed ? 'PASSED' : 'FAILED'}${r.message !== undefined ? ' - ' + r.message : ''}`;
   });
 
-  const details = results.map((r) => {
-    const status = r.passed ? 'PASSED' : 'FAILED';
-    return `${r.gate.name}: ${status}\n  ${r.message ?? 'No issues detected'}`;
-  }).join('\n\n');
+  const details = results
+    .map((r) => {
+      const status = r.passed ? 'PASSED' : 'FAILED';
+      return `${r.gate.name}: ${status}\n  ${r.message ?? 'No issues detected'}`;
+    })
+    .join('\n\n');
 
   const summary = `${passed ? 'All gates passed' : 'Some gates failed'}\n\n${summaryLines.join('\n')}`;
 
@@ -82,20 +84,22 @@ export function generateJUnitXML(results: GateResult[], _evalResults?: EvalRun):
   const timestamp = new Date().toISOString();
   const testName = 'regression-gates';
 
-  const testCases = results.map((r) => {
-    const testCase = `    <testcase name="${r.gate.name}" classname="gates" time="0">`;
-    if (!r.passed) {
-      return `${testCase}
+  const testCases = results
+    .map((r) => {
+      const testCase = `    <testcase name="${r.gate.name}" classname="gates" time="0">`;
+      if (!r.passed) {
+        return `${testCase}
       <failure message="${escapeXml(r.message ?? 'Gate failed')}"/>
     </testcase>`;
-    }
-    return `${testCase}
+      }
+      return `${testCase}
     </testcase>`;
-  }).join('\n');
+    })
+    .join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="classifier-evals" tests="${results.length}" failures="${results.filter(r => !r.passed).length}" time="0">
-  <testsuite name="${testName}" tests="${results.length}" failures="${results.filter(r => !r.passed).length}" time="0" timestamp="${timestamp}">
+<testsuites name="classifier-evals" tests="${results.length}" failures="${results.filter((r) => !r.passed).length}" time="0">
+  <testsuite name="${testName}" tests="${results.length}" failures="${results.filter((r) => !r.passed).length}" time="0" timestamp="${timestamp}">
 ${testCases}
   </testsuite>
 </testsuites>`;

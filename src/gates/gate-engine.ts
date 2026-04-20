@@ -63,7 +63,7 @@ export class GateEngine {
   evaluateGates(
     metrics: ClassificationMetrics,
     gates: RegressionGate[],
-    context?: GateEvaluationContext
+    context?: GateEvaluationContext,
   ): GateEvaluationResult {
     const gateResults: GateResult[] = [];
 
@@ -72,8 +72,8 @@ export class GateEngine {
 
       if (this.config.cacheResults === true) {
         const cached = this.cache.get(cacheKey);
-        const cacheValid = cached !== undefined &&
-          Date.now() - cached.timestamp < GateEngine.DEFAULT_CACHE_TTL_MS;
+        const cacheValid =
+          cached !== undefined && Date.now() - cached.timestamp < GateEngine.DEFAULT_CACHE_TTL_MS;
         if (cached !== undefined && cacheValid) {
           gateResults.push(cached.result);
           continue;
@@ -87,12 +87,7 @@ export class GateEngine {
             result = evaluateThresholdGate(metrics, gate, context);
             break;
           case 'baseline-comparison':
-            result = evaluateBaselineComparison(
-              metrics,
-              gate,
-              this.config.baselinePath,
-              context
-            );
+            result = evaluateBaselineComparison(metrics, gate, this.config.baselinePath, context);
             break;
           case 'distribution':
             result = evaluateDistributionGate(metrics, gate, context);
@@ -131,7 +126,7 @@ export class GateEngine {
       }
     }
 
-    const passedCount = gateResults.filter(g => g.passed).length;
+    const passedCount = gateResults.filter((g) => g.passed).length;
     const failedCount = gateResults.length - passedCount;
 
     return {

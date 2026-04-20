@@ -28,7 +28,7 @@ export interface PRCurveData {
  */
 export function generateHeatmapData(
   cm: ConfusionMatrix,
-  normalize: 'row' | 'column' | false = false
+  normalize: 'row' | 'column' | false = false,
 ): HeatmapData {
   const labels = cm.labels;
   const size = labels.length;
@@ -66,9 +66,7 @@ export function generateHeatmapData(
 /**
  * Generates bar chart data for per-class metrics
  */
-export function generateMetricsBarChart(
-  cm: ConfusionMatrix
-): BarChartData {
+export function generateMetricsBarChart(cm: ConfusionMatrix): BarChartData {
   const labels = cm.labels;
   const precision = cm.per_class.map((c) => c?.precision ?? 0);
   const recall = cm.per_class.map((c) => c?.recall ?? 0);
@@ -87,7 +85,10 @@ export function generateMetricsBarChart(
 /**
  * Generates PR curve data from samples with confidence scores
  */
-export function generatePRCurveData(samples: ClassificationResult[], positiveLabel: string): PRCurveData {
+export function generatePRCurveData(
+  samples: ClassificationResult[],
+  positiveLabel: string,
+): PRCurveData {
   const scoredSamples = samples
     .filter((s): s is ClassificationResult & { confidence: number } => s.confidence !== undefined)
     .map((s) => ({
@@ -119,8 +120,11 @@ export function generatePRCurveData(samples: ClassificationResult[], positiveLab
 
   for (const sample of scoredSamples) {
     // Threshold sweep: every sample at or above this confidence is classified as positive
-    if (sample.isPositive) {tp++;}
-    else {fp++;}
+    if (sample.isPositive) {
+      tp++;
+    } else {
+      fp++;
+    }
 
     const p = tp + fp > 0 ? tp / (tp + fp) : 0;
     const r = tp / totalPositives;

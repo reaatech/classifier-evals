@@ -116,18 +116,14 @@ describe('judge engine and helpers', () => {
         strategy: 'majority',
         agreementThreshold: 0.5,
         useWeightedVoting: false,
-      }
+      },
     );
-    const aggregatedConsensus = aggregateConsensusResults(
-      [consensus],
-      costAccount,
-      {
-        minSamplesPerClass: 1,
-        biasDetectionThreshold: 0.1,
-        includeDisagreementAnalysis: false,
-        maxDisagreementSamples: 10,
-      }
-    );
+    const aggregatedConsensus = aggregateConsensusResults([consensus], costAccount, {
+      minSamplesPerClass: 1,
+      biasDetectionThreshold: 0.1,
+      includeDisagreementAnalysis: false,
+      maxDisagreementSamples: 10,
+    });
     expect(aggregatedConsensus.totalSamples).toBe(1);
   });
 
@@ -174,20 +170,34 @@ describe('judge engine and helpers', () => {
       generatePRCurveData(
         [
           sample,
-          { ...sample, text: 'billing', label: 'billing', predicted_label: 'billing', confidence: 0.8 },
+          {
+            ...sample,
+            text: 'billing',
+            label: 'billing',
+            predicted_label: 'billing',
+            confidence: 0.8,
+          },
         ],
-        'auth'
-      ).thresholds.length
+        'auth',
+      ).thresholds.length,
     ).toBeGreaterThan(0);
   });
 
   it('PR curve returns empty for samples without confidence', () => {
     const result = generatePRCurveData(
       [
-        { text: 'a', label: 'auth', predicted_label: 'auth' } as import('../../src/types/index.js').ClassificationResult,
-        { text: 'b', label: 'billing', predicted_label: 'billing' } as import('../../src/types/index.js').ClassificationResult,
+        {
+          text: 'a',
+          label: 'auth',
+          predicted_label: 'auth',
+        } as import('../../src/types/index.js').ClassificationResult,
+        {
+          text: 'b',
+          label: 'billing',
+          predicted_label: 'billing',
+        } as import('../../src/types/index.js').ClassificationResult,
       ],
-      'auth'
+      'auth',
     );
     expect(result.thresholds).toEqual([]);
     expect(result.precision).toEqual([]);
@@ -200,7 +210,7 @@ describe('judge engine and helpers', () => {
         { text: 'a', label: 'auth', predicted_label: 'auth', confidence: 0.9 },
         { text: 'b', label: 'billing', predicted_label: 'billing', confidence: 0.8 },
       ],
-      'nonexistent'
+      'nonexistent',
     );
     expect(result.thresholds).toEqual([]);
     expect(result.precision).toEqual([]);
@@ -214,8 +224,28 @@ describe('judge engine and helpers', () => {
         [3, 4],
       ],
       per_class: [
-        { label: 'a', true_positives: 2, false_positives: 3, false_negatives: 1, true_negatives: 4, precision: 0.4, recall: 0.67, f1: 0.5, support: 3 },
-        { label: 'b', true_positives: 4, false_positives: 1, false_negatives: 3, true_negatives: 2, precision: 0.8, recall: 0.57, f1: 0.67, support: 7 },
+        {
+          label: 'a',
+          true_positives: 2,
+          false_positives: 3,
+          false_negatives: 1,
+          true_negatives: 4,
+          precision: 0.4,
+          recall: 0.67,
+          f1: 0.5,
+          support: 3,
+        },
+        {
+          label: 'b',
+          true_positives: 4,
+          false_positives: 1,
+          false_negatives: 3,
+          true_negatives: 2,
+          precision: 0.8,
+          recall: 0.57,
+          f1: 0.67,
+          support: 7,
+        },
       ],
     };
     const result = generateHeatmapData(cm, 'column');
@@ -227,10 +257,33 @@ describe('judge engine and helpers', () => {
   it('heatmap with no normalization returns raw values', () => {
     const cm = {
       labels: ['a', 'b'],
-      matrix: [[2, 1], [3, 4]],
+      matrix: [
+        [2, 1],
+        [3, 4],
+      ],
       per_class: [
-        { label: 'a', true_positives: 2, false_positives: 3, false_negatives: 1, true_negatives: 4, precision: 0.4, recall: 0.67, f1: 0.5, support: 3 },
-        { label: 'b', true_positives: 4, false_positives: 1, false_negatives: 3, true_negatives: 2, precision: 0.8, recall: 0.57, f1: 0.67, support: 7 },
+        {
+          label: 'a',
+          true_positives: 2,
+          false_positives: 3,
+          false_negatives: 1,
+          true_negatives: 4,
+          precision: 0.4,
+          recall: 0.67,
+          f1: 0.5,
+          support: 3,
+        },
+        {
+          label: 'b',
+          true_positives: 4,
+          false_positives: 1,
+          false_negatives: 3,
+          true_negatives: 2,
+          precision: 0.8,
+          recall: 0.57,
+          f1: 0.67,
+          support: 7,
+        },
       ],
     };
     const result = generateHeatmapData(cm, false);
@@ -360,7 +413,10 @@ describe('judge engine and helpers', () => {
 
   it('calls callOpenAI path when OPENAI_API_KEY is set', async () => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key');
-    const judge = createJudgeEngine({ model: 'gpt-4o', budget: { maxBudget: 10, alertThreshold: 80 } });
+    const judge = createJudgeEngine({
+      model: 'gpt-4o',
+      budget: { maxBudget: 10, alertThreshold: 80 },
+    });
     const result = await judge.evaluateSample(sample);
     expect(result.result.judge_model).toContain('heuristic');
     vi.unstubAllEnvs();
@@ -368,14 +424,20 @@ describe('judge engine and helpers', () => {
 
   it('calls callAnthropic path when ANTHROPIC_API_KEY is set', async () => {
     vi.stubEnv('ANTHROPIC_API_KEY', 'test-key');
-    const judge = createJudgeEngine({ model: 'claude-sonnet', budget: { maxBudget: 10, alertThreshold: 80 } });
+    const judge = createJudgeEngine({
+      model: 'claude-sonnet',
+      budget: { maxBudget: 10, alertThreshold: 80 },
+    });
     const result = await judge.evaluateSample(sample);
     expect(result.result.judge_model).toContain('heuristic');
     vi.unstubAllEnvs();
   });
 
   it('exposes isBudgetExceeded', () => {
-    const judge = createJudgeEngine({ model: 'gpt-4o', budget: { maxBudget: 10, alertThreshold: 80 } });
+    const judge = createJudgeEngine({
+      model: 'gpt-4o',
+      budget: { maxBudget: 10, alertThreshold: 80 },
+    });
     expect(judge.isBudgetExceeded()).toBe(false);
     expect(judge.getCostBreakdown()).toBeDefined();
   });
@@ -477,7 +539,12 @@ describe('judge engine and helpers', () => {
 
   it('heuristic judge returns correct result for mismatched labels', async () => {
     const judge = createJudgeEngine({ model: 'unknown-model' });
-    const mismatchSample = { text: 'hello', label: 'billing', predicted_label: 'auth', confidence: 0.5 };
+    const mismatchSample = {
+      text: 'hello',
+      label: 'billing',
+      predicted_label: 'auth',
+      confidence: 0.5,
+    };
     const result = await judge.evaluateSample(mismatchSample);
     expect(result.result.judge_correct).toBe(false);
     expect(result.result.judge_confidence).toBe(0.8);
@@ -494,7 +561,11 @@ describe('judge engine and helpers', () => {
   });
 
   it('cost tracker tracks maxCostPerSample budget exceeded', () => {
-    const tracker = createCostTracker({ maxBudget: 100, alertThreshold: 80, maxCostPerSample: 0.000001 });
+    const tracker = createCostTracker({
+      maxBudget: 100,
+      alertThreshold: 80,
+      maxCostPerSample: 0.000001,
+    });
     tracker.addCost('gpt-4o', 10000, 5000, 'correct');
     expect(tracker.isBudgetExceeded()).toBe(true);
   });

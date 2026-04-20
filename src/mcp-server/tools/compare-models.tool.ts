@@ -2,7 +2,11 @@
  * compare_models MCP tool implementation
  */
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { comparePersistedEvalRuns, compareModels, summarizeComparison } from '../../metrics/comparison.js';
+import {
+  comparePersistedEvalRuns,
+  compareModels,
+  summarizeComparison,
+} from '../../metrics/comparison.js';
 import { logger } from '../../observability/logger.js';
 import type { ClassificationResult, EvalRun } from '../../types/index.js';
 import { loadEvalRunFromFile } from '../../utils/eval-run.js';
@@ -15,7 +19,9 @@ export async function compareModelsTool(args: Record<string, unknown>): Promise<
 
   if (baselineResultsArg === undefined || candidateResultsArg === undefined) {
     return {
-      content: [{ type: 'text', text: 'Error: baseline_results and candidate_results are required' }],
+      content: [
+        { type: 'text', text: 'Error: baseline_results and candidate_results are required' },
+      ],
       isError: true,
     };
   }
@@ -26,12 +32,12 @@ export async function compareModelsTool(args: Record<string, unknown>): Promise<
         ? comparePersistedEvalRuns(
             loadEvalRunFromFile(baselineResultsArg),
             loadEvalRunFromFile(candidateResultsArg),
-            significanceLevel
+            significanceLevel,
           )
         : compareModels(
             baselineResultsArg as ClassificationResult[],
             candidateResultsArg as ClassificationResult[],
-            significanceLevel
+            significanceLevel,
           );
     const summary = summarizeComparison(comparison);
 
@@ -41,7 +47,7 @@ export async function compareModelsTool(args: Record<string, unknown>): Promise<
         candidate: candidateResultsArg as string | ClassificationResult[] | EvalRun,
         accuracyDifference: comparison.accuracy_difference,
       },
-      'Model comparison completed'
+      'Model comparison completed',
     );
 
     return {

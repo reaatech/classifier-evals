@@ -10,7 +10,12 @@ import { createGateEngine } from '../../src/gates/gate-engine.js';
 import { evaluateThresholdGate } from '../../src/gates/threshold-gates.js';
 import { evaluateDistributionGate } from '../../src/gates/distribution-gates.js';
 import { evaluateBaselineComparison } from '../../src/gates/baseline-comparison.js';
-import { compareThreshold, formatMetricValue, getMetricValue, GateEvaluationContext } from '../../src/gates/metric-lookup.js';
+import {
+  compareThreshold,
+  formatMetricValue,
+  getMetricValue,
+  GateEvaluationContext,
+} from '../../src/gates/metric-lookup.js';
 import { ClassificationMetrics, RegressionGate } from '../../src/types/index.js';
 import { createEvalRunFromSamples } from '../../src/utils/eval-run.js';
 
@@ -521,9 +526,7 @@ describe('Distribution Gates - additional branches', () => {
 
   it('should default threshold to 0 and operator to <=', () => {
     const evalRun = createEvalRunFromSamples({
-      samples: [
-        { text: 'a', label: 'alpha', predicted_label: 'unknown', confidence: 0.3 },
-      ],
+      samples: [{ text: 'a', label: 'alpha', predicted_label: 'unknown', confidence: 0.3 }],
     });
 
     const gate: RegressionGate = {
@@ -612,7 +615,9 @@ describe('Baseline Comparison - additional branches', () => {
       baseline_path: baselinePath,
     };
 
-    const result = evaluateBaselineComparison(candidateRun.metrics, gate, undefined, { evalRun: candidateRun });
+    const result = evaluateBaselineComparison(candidateRun.metrics, gate, undefined, {
+      evalRun: candidateRun,
+    });
     expect(result.passed).toBe(true);
     expect(result.message).toContain('matched or improved');
   });
@@ -621,16 +626,12 @@ describe('Baseline Comparison - additional branches', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'baseline-nometric-'));
     const baselinePath = path.join(tempDir, 'baseline.json');
     const baselineRun = createEvalRunFromSamples({
-      samples: [
-        { text: 'a', label: 'alpha', predicted_label: 'alpha', confidence: 0.9 },
-      ],
+      samples: [{ text: 'a', label: 'alpha', predicted_label: 'alpha', confidence: 0.9 }],
     });
     fs.writeFileSync(baselinePath, JSON.stringify(baselineRun, null, 2));
 
     const candidateRun = createEvalRunFromSamples({
-      samples: [
-        { text: 'a', label: 'alpha', predicted_label: 'alpha', confidence: 0.9 },
-      ],
+      samples: [{ text: 'a', label: 'alpha', predicted_label: 'alpha', confidence: 0.9 }],
     });
 
     const gate: RegressionGate = {
@@ -640,7 +641,9 @@ describe('Baseline Comparison - additional branches', () => {
       baseline_path: baselinePath,
     };
 
-    const result = evaluateBaselineComparison(candidateRun.metrics, gate, undefined, { evalRun: candidateRun });
+    const result = evaluateBaselineComparison(candidateRun.metrics, gate, undefined, {
+      evalRun: candidateRun,
+    });
     expect(result.passed).toBe(false);
     expect(result.message).toContain('Unable to compare baseline metric');
   });
@@ -683,9 +686,7 @@ describe('Baseline Comparison - additional branches', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'baseline-nocm-'));
     const baselinePath = path.join(tempDir, 'baseline.json');
     const baselineRun = createEvalRunFromSamples({
-      samples: [
-        { text: 'a', label: 'alpha', predicted_label: 'alpha', confidence: 0.9 },
-      ],
+      samples: [{ text: 'a', label: 'alpha', predicted_label: 'alpha', confidence: 0.9 }],
     });
     fs.writeFileSync(baselinePath, JSON.stringify(baselineRun, null, 2));
 
@@ -699,7 +700,9 @@ describe('Baseline Comparison - additional branches', () => {
 
     const result = evaluateBaselineComparison(metrics, gate);
     expect(result.passed).toBe(false);
-    expect(result.message).toContain('Per-class baseline comparison requires evalRun confusion matrix');
+    expect(result.message).toContain(
+      'Per-class baseline comparison requires evalRun confusion matrix',
+    );
   });
 });
 
@@ -722,9 +725,7 @@ describe('Metric Lookup Helpers', () => {
 
   it('resolves distribution metrics from context', () => {
     const evalRun = createEvalRunFromSamples({
-      samples: [
-        { text: 'a', label: 'alpha', predicted_label: 'unknown', confidence: 0.3 },
-      ],
+      samples: [{ text: 'a', label: 'alpha', predicted_label: 'unknown', confidence: 0.3 }],
     });
     const metrics = evalRun.metrics;
     const value = getMetricValue(metrics, 'unknown_rate', { evalRun });

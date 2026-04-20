@@ -6,7 +6,7 @@ import { ClassificationResult, ConfusionMatrix } from '../types/index.js';
 
 /**
  * Build a confusion matrix from classification results
- * 
+ *
  * @param samples - Array of classification results
  * @returns Confusion matrix data structure
  */
@@ -27,15 +27,15 @@ export function buildConfusionMatrix(samples: ClassificationResult[]): Confusion
   });
 
   // Initialize matrix with zeros
-  const matrix: number[][] = Array.from({ length: numLabels }, () =>
-    Array(numLabels).fill(0)
-  );
+  const matrix: number[][] = Array.from({ length: numLabels }, () => Array(numLabels).fill(0));
 
   // Populate matrix: matrix[true_label][predicted_label]
   for (const sample of samples) {
     const trueIdx = labelToIndex.get(sample.label);
     const predIdx = labelToIndex.get(sample.predicted_label);
-    if (trueIdx === undefined || predIdx === undefined) {continue;}
+    if (trueIdx === undefined || predIdx === undefined) {
+      continue;
+    }
     matrix[trueIdx]![predIdx]!++;
   }
 
@@ -74,20 +74,18 @@ export function buildConfusionMatrix(samples: ClassificationResult[]): Confusion
 
 /**
  * Normalize a confusion matrix
- * 
+ *
  * @param cm - Confusion matrix to normalize
  * @param mode - 'true' (row-wise), 'pred' (column-wise), or 'all' (overall)
  * @returns Normalized confusion matrix
  */
 export function normalizeConfusionMatrix(
   cm: ConfusionMatrix,
-  mode: 'true' | 'pred' | 'all' = 'true'
+  mode: 'true' | 'pred' | 'all' = 'true',
 ): number[][] {
   const { matrix, labels } = cm;
   const numLabels = labels.length;
-  const normalized: number[][] = Array.from({ length: numLabels }, () =>
-    Array(numLabels).fill(0)
-  );
+  const normalized: number[][] = Array.from({ length: numLabels }, () => Array(numLabels).fill(0));
 
   if (mode === 'all') {
     // Normalize by total
@@ -157,7 +155,7 @@ export function formatConfusionMatrix(cm: ConfusionMatrix): string {
   const numLabels = labels.length;
 
   // Calculate column widths
-  const labelWidth = Math.max(...labels.map(l => l.length), 7); // 'Predicted' header
+  const labelWidth = Math.max(...labels.map((l) => l.length), 7); // 'Predicted' header
   const cellWidth = 8;
 
   let result = '';
@@ -190,7 +188,7 @@ export function formatConfusionMatrix(cm: ConfusionMatrix): string {
  */
 export function getErrorRates(cm: ConfusionMatrix): Record<string, number> {
   const errorRates: Record<string, number> = {};
-  
+
   for (let i = 0; i < cm.labels.length; i++) {
     const label = cm.labels[i]!;
     const total = cm.matrix[i]!.reduce((sum, v) => sum + v, 0);
@@ -206,9 +204,10 @@ export function getErrorRates(cm: ConfusionMatrix): Record<string, number> {
  */
 export function getTopMisclassifications(
   cm: ConfusionMatrix,
-  topN: number = 10
+  topN: number = 10,
 ): Array<{ trueLabel: string; predictedLabel: string; count: number }> {
-  const misclassifications: Array<{ trueLabel: string; predictedLabel: string; count: number }> = [];
+  const misclassifications: Array<{ trueLabel: string; predictedLabel: string; count: number }> =
+    [];
 
   for (let i = 0; i < cm.labels.length; i++) {
     for (let j = 0; j < cm.labels.length; j++) {

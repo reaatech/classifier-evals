@@ -156,13 +156,17 @@ export const ModelComparisonSchema = z.object({
   p_value: z.number().min(0).max(1).optional(),
   is_significant: z.boolean().optional(),
   effect_size: z.number().optional(),
-  per_class_comparison: z.array(z.object({
-    label: z.string(),
-    baseline_f1: z.number().min(0).max(1),
-    candidate_f1: z.number().min(0).max(1),
-    difference: z.number(),
-    improved: z.boolean(),
-  })).default([]),
+  per_class_comparison: z
+    .array(
+      z.object({
+        label: z.string(),
+        baseline_f1: z.number().min(0).max(1),
+        candidate_f1: z.number().min(0).max(1),
+        difference: z.number(),
+        improved: z.boolean(),
+      }),
+    )
+    .default([]),
 });
 
 export type ModelComparison = z.infer<typeof ModelComparisonSchema>;
@@ -183,11 +187,15 @@ export const EvalRunSchema = z.object({
   metrics: ClassificationMetricsSchema,
   judged_results: z.array(JudgedResultSchema).optional(),
   judge_cost: z.number().min(0).optional(),
-  gate_results: z.array(z.object({
-    name: z.string(),
-    passed: z.boolean(),
-    message: z.string().optional(),
-  })).optional(),
+  gate_results: z
+    .array(
+      z.object({
+        name: z.string(),
+        passed: z.boolean(),
+        message: z.string().optional(),
+      }),
+    )
+    .optional(),
   all_gates_passed: z.boolean().optional(),
   started_at: z.string().datetime(),
   completed_at: z.string().datetime(),
@@ -239,7 +247,7 @@ export const LLMJudgeConfigSchema = z.object({
   prompt_template: z.string().default('classification-eval'),
   consensus_count: z.number().min(1).max(10).default(1),
   max_cost_per_sample: z.number().min(0).default(0.05),
-  budget_limit: z.number().min(0).default(50.00),
+  budget_limit: z.number().min(0).default(50.0),
   retry_count: z.number().min(0).max(5).default(3),
   timeout_ms: z.number().min(1000).max(60000).default(30000),
   concurrency: z.number().min(1).max(100).default(5),
@@ -299,12 +307,16 @@ export const GateResultSchema = z.object({
   actual_value: z.number().optional(),
   expected_value: z.number().optional(),
   message: z.string().optional(),
-  failures: z.array(z.object({
-    label: z.string().optional(),
-    metric: z.string(),
-    actual: z.number(),
-    expected: z.number(),
-  })).default([]),
+  failures: z
+    .array(
+      z.object({
+        label: z.string().optional(),
+        metric: z.string(),
+        actual: z.number(),
+        expected: z.number(),
+      }),
+    )
+    .default([]),
 });
 
 export type GateResult = z.infer<typeof GateResultSchema>;

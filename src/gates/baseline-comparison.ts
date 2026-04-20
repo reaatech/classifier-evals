@@ -5,7 +5,12 @@
 import { readFileSync } from 'fs';
 import { ClassificationMetrics, RegressionGate, GateResult } from '../types/index.js';
 import type { EvalRun } from '../types/index.js';
-import { compareThreshold, formatMetricValue, getMetricValue, type GateEvaluationContext } from './metric-lookup.js';
+import {
+  compareThreshold,
+  formatMetricValue,
+  getMetricValue,
+  type GateEvaluationContext,
+} from './metric-lookup.js';
 
 function loadBaselineEvalRun(baselinePath: string): EvalRun {
   try {
@@ -22,7 +27,7 @@ export function evaluateBaselineComparison(
   metrics: ClassificationMetrics,
   gate: RegressionGate,
   baselinePath?: string,
-  context?: GateEvaluationContext
+  context?: GateEvaluationContext,
 ): GateResult {
   if (gate.type !== 'baseline-comparison') {
     return {
@@ -73,16 +78,13 @@ export function evaluateBaselineComparison(
       return {
         passed: false,
         gate,
-        message:
-          'Per-class baseline comparison requires evalRun confusion matrix context',
+        message: 'Per-class baseline comparison requires evalRun confusion matrix context',
         failures: [],
       };
     }
 
     const failures = baselineClasses.flatMap((baselineClass) => {
-      const candidateClass = candidateClasses.find(
-        (entry) => entry.label === baselineClass.label
-      );
+      const candidateClass = candidateClasses.find((entry) => entry.label === baselineClass.label);
 
       if (!candidateClass) {
         return [
@@ -123,11 +125,7 @@ export function evaluateBaselineComparison(
   }
 
   const candidateValue = getMetricValue(metrics, gate.metric, context);
-  const baselineValue = getMetricValue(
-    baselineRun.metrics,
-    gate.metric,
-    { evalRun: baselineRun }
-  );
+  const baselineValue = getMetricValue(baselineRun.metrics, gate.metric, { evalRun: baselineRun });
 
   if (candidateValue === undefined || baselineValue === undefined) {
     return {

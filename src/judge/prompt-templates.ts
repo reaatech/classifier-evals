@@ -167,10 +167,7 @@ export function getPromptTemplate(type: PromptTemplateType): PromptTemplate {
 /**
  * Register a custom prompt template
  */
-export function registerCustomTemplate(
-  name: string,
-  template: PromptTemplate
-): void {
+export function registerCustomTemplate(name: string, template: PromptTemplate): void {
   templates[name] = template;
 }
 
@@ -179,7 +176,7 @@ export function registerCustomTemplate(
  */
 export function formatPrompt(
   template: PromptTemplate,
-  sample: ClassificationResult
+  sample: ClassificationResult,
 ): { system: string; user: string } {
   return {
     system: template.systemPrompt,

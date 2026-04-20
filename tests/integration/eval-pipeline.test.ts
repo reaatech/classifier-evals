@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import {
-  loadDataset,
-  buildConfusionMatrix,
-  calculateAllMetrics,
-} from '../../src/index.js';
+import { loadDataset, buildConfusionMatrix, calculateAllMetrics } from '../../src/index.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -34,17 +30,69 @@ describe('End-to-end evaluation pipeline', () => {
 
     // Create test JSONL
     const jsonlContent = [
-      { text: 'Reset my password', label: 'password_reset', predicted_label: 'password_reset', confidence: 0.95 },
-      { text: 'Cancel my subscription', label: 'cancel_subscription', predicted_label: 'cancel_subscription', confidence: 0.88 },
-      { text: 'Where is my order', label: 'order_status', predicted_label: 'order_status', confidence: 0.92 },
-      { text: 'I want a refund', label: 'refund_request', predicted_label: 'refund_request', confidence: 0.85 },
-      { text: 'Change my email', label: 'account_update', predicted_label: 'account_update', confidence: 0.78 },
-      { text: 'Speak to an agent', label: 'speak_to_agent', predicted_label: 'speak_to_agent', confidence: 0.91 },
-      { text: 'Reset my password', label: 'password_reset', predicted_label: 'cancel_subscription', confidence: 0.65 },
-      { text: 'Track my package', label: 'order_status', predicted_label: 'order_status', confidence: 0.87 },
-      { text: 'Update payment method', label: 'payment_update', predicted_label: 'payment_update', confidence: 0.82 },
-      { text: 'Delete my account', label: 'cancel_subscription', predicted_label: 'cancel_subscription', confidence: 0.94 },
-    ].map(r => JSON.stringify(r)).join('\n');
+      {
+        text: 'Reset my password',
+        label: 'password_reset',
+        predicted_label: 'password_reset',
+        confidence: 0.95,
+      },
+      {
+        text: 'Cancel my subscription',
+        label: 'cancel_subscription',
+        predicted_label: 'cancel_subscription',
+        confidence: 0.88,
+      },
+      {
+        text: 'Where is my order',
+        label: 'order_status',
+        predicted_label: 'order_status',
+        confidence: 0.92,
+      },
+      {
+        text: 'I want a refund',
+        label: 'refund_request',
+        predicted_label: 'refund_request',
+        confidence: 0.85,
+      },
+      {
+        text: 'Change my email',
+        label: 'account_update',
+        predicted_label: 'account_update',
+        confidence: 0.78,
+      },
+      {
+        text: 'Speak to an agent',
+        label: 'speak_to_agent',
+        predicted_label: 'speak_to_agent',
+        confidence: 0.91,
+      },
+      {
+        text: 'Reset my password',
+        label: 'password_reset',
+        predicted_label: 'cancel_subscription',
+        confidence: 0.65,
+      },
+      {
+        text: 'Track my package',
+        label: 'order_status',
+        predicted_label: 'order_status',
+        confidence: 0.87,
+      },
+      {
+        text: 'Update payment method',
+        label: 'payment_update',
+        predicted_label: 'payment_update',
+        confidence: 0.82,
+      },
+      {
+        text: 'Delete my account',
+        label: 'cancel_subscription',
+        predicted_label: 'cancel_subscription',
+        confidence: 0.94,
+      },
+    ]
+      .map((r) => JSON.stringify(r))
+      .join('\n');
     fs.writeFileSync(jsonlPath, jsonlContent);
   });
 
@@ -110,12 +158,15 @@ describe('End-to-end evaluation pipeline', () => {
 
   it('should handle edge case with single sample', async () => {
     const singleSamplePath = path.join(tempDir, 'single.jsonl');
-    fs.writeFileSync(singleSamplePath, JSON.stringify({
-      text: 'Test',
-      label: 'test_label',
-      predicted_label: 'test_label',
-      confidence: 0.9
-    }));
+    fs.writeFileSync(
+      singleSamplePath,
+      JSON.stringify({
+        text: 'Test',
+        label: 'test_label',
+        predicted_label: 'test_label',
+        confidence: 0.9,
+      }),
+    );
 
     const dataset = await loadDataset(singleSamplePath);
     const metrics = calculateAllMetrics(dataset.samples);

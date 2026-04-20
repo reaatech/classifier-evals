@@ -40,7 +40,7 @@ describe('Dataset Loader', () => {
 "Hello world",greeting`;
 
       await expect(loadDatasetFromContent(csvContent, 'csv')).rejects.toThrow(
-        'Missing required column: label'
+        'Missing required column: label',
       );
     });
 
@@ -107,9 +107,7 @@ subscription",billing,retention,0.25`;
 
     it('should parse JSON with data field', async () => {
       const jsonContent = JSON.stringify({
-        data: [
-          { text: 'Hello', label: 'greeting', predicted_label: 'greeting' },
-        ],
+        data: [{ text: 'Hello', label: 'greeting', predicted_label: 'greeting' }],
       });
 
       const dataset = await loadDatasetFromContent(jsonContent, 'json');
@@ -191,10 +189,8 @@ describe('Dataset Validator', () => {
   describe('Schema validation', () => {
     it('should validate valid samples', async () => {
       const dataset = await loadDatasetFromContent(
-        JSON.stringify([
-          { text: 'Hello', label: 'greeting', predicted_label: 'greeting' },
-        ]),
-        'json'
+        JSON.stringify([{ text: 'Hello', label: 'greeting', predicted_label: 'greeting' }]),
+        'json',
       );
 
       const result = validateDataset(dataset);
@@ -205,10 +201,8 @@ describe('Dataset Validator', () => {
     it('should detect empty text', async () => {
       // The loader filters out empty text, so we test with a mix of valid and invalid
       const dataset = await loadDatasetFromContent(
-        JSON.stringify([
-          { text: 'Hello', label: 'greeting', predicted_label: 'greeting' },
-        ]),
-        'json'
+        JSON.stringify([{ text: 'Hello', label: 'greeting', predicted_label: 'greeting' }]),
+        'json',
       );
 
       // After loading, empty text samples are filtered out
@@ -222,7 +216,7 @@ describe('Dataset Validator', () => {
         JSON.stringify([
           { text: 'Hello', label: 'greeting', predicted_label: 'greeting', confidence: 1.5 },
         ]),
-        'json'
+        'json',
       );
 
       // Note: loader clamps confidence, so this would be valid after loading
@@ -239,11 +233,11 @@ describe('Dataset Validator', () => {
           { text: 'Hello', label: 'greeting', predicted_label: 'greeting' },
           { text: 'Hello', label: 'greeting', predicted_label: 'farewell' },
         ]),
-        'json'
+        'json',
       );
 
       const result = validateDataset(dataset);
-      expect(result.warnings.some(w => w.type === 'duplicate_text')).toBe(true);
+      expect(result.warnings.some((w) => w.type === 'duplicate_text')).toBe(true);
     });
   });
 
@@ -256,10 +250,7 @@ describe('Dataset Validator', () => {
         predicted_label: 'majority',
       }));
 
-      const dataset = await loadDatasetFromContent(
-        JSON.stringify(samples),
-        'json'
-      );
+      const dataset = await loadDatasetFromContent(JSON.stringify(samples), 'json');
 
       const result = validateDataset(dataset);
       // Check for imbalance warning (threshold may vary)
@@ -273,29 +264,27 @@ describe('Dataset Validator', () => {
           { text: 'b', label: 'class1', predicted_label: 'class1' },
           { text: 'c', label: 'class2', predicted_label: 'class2' },
         ]),
-        'json'
+        'json',
       );
 
       const result = validateDataset(dataset);
-      expect(result.warnings.some(w => w.type === 'single_sample_classes')).toBe(true);
+      expect(result.warnings.some((w) => w.type === 'single_sample_classes')).toBe(true);
     });
   });
 
   describe('Edge cases', () => {
     it('should throw on unsupported format', async () => {
-      await expect(
-        loadDatasetFromContent('data', 'xml' as 'csv')
-      ).rejects.toThrow('Unsupported format');
+      await expect(loadDatasetFromContent('data', 'xml' as 'csv')).rejects.toThrow(
+        'Unsupported format',
+      );
     });
 
     it('should throw on empty samples after filtering', async () => {
-      const jsonContent = JSON.stringify([
-        { text: '', label: 'a', predicted_label: 'a' },
-      ]);
+      const jsonContent = JSON.stringify([{ text: '', label: 'a', predicted_label: 'a' }]);
 
-      await expect(
-        loadDatasetFromContent(jsonContent, 'json')
-      ).rejects.toThrow('No valid samples found');
+      await expect(loadDatasetFromContent(jsonContent, 'json')).rejects.toThrow(
+        'No valid samples found',
+      );
     });
   });
 });
