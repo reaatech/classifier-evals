@@ -61,9 +61,16 @@ describe('observability and CI helpers', () => {
   });
 
   it('formats CI output and span wrappers', async () => {
+    vi.stubEnv('GITHUB_ACTIONS', '');
     const gateResults: GateResult[] = [
       {
-        gate: { name: 'accuracy', type: 'threshold', metric: 'accuracy', operator: '>=', threshold: 0.8 },
+        gate: {
+          name: 'accuracy',
+          type: 'threshold',
+          metric: 'accuracy',
+          operator: '>=',
+          threshold: 0.8,
+        },
         passed: false,
         message: 'too low',
         failures: [],
@@ -73,6 +80,7 @@ describe('observability and CI helpers', () => {
     expect(generateJUnitXML(gateResults)).toContain('<failure');
     expect(generatePRComment(gateResults)).toContain('Regression Gates');
     expect(isGitHubActions()).toBe(false);
+    vi.unstubAllEnvs();
 
     const span = startEvalSpan('dataset.csv', 10, 'gpt-4o');
     endSpan(span);
@@ -88,7 +96,13 @@ describe('observability and CI helpers', () => {
   it('generates PR comment with eval results summary', () => {
     const gateResults: GateResult[] = [
       {
-        gate: { name: 'accuracy', type: 'threshold', metric: 'accuracy', operator: '>=', threshold: 0.8 },
+        gate: {
+          name: 'accuracy',
+          type: 'threshold',
+          metric: 'accuracy',
+          operator: '>=',
+          threshold: 0.8,
+        },
         passed: true,
         message: 'ok',
         failures: [],
@@ -111,7 +125,9 @@ describe('observability and CI helpers', () => {
     vi.stubEnv('GITHUB_ACTIONS', 'true');
     expect(isGitHubActions()).toBe(true);
     vi.unstubAllEnvs();
+    vi.stubEnv('GITHUB_ACTIONS', '');
     expect(isGitHubActions()).toBe(false);
+    vi.unstubAllEnvs();
   });
 
   it('setGitHubOutput writes to GITHUB_OUTPUT file in GitHub Actions', () => {
@@ -132,9 +148,15 @@ describe('observability and CI helpers', () => {
     const origWarn = originalLogger.warn;
     const origError = originalLogger.error;
 
-    originalLogger.info = function() { throw new Error('info fail'); } as (...args: unknown[]) => void;
-    originalLogger.warn = function() { throw new Error('warn fail'); } as (...args: unknown[]) => void;
-    originalLogger.error = function() { throw new Error('error fail'); } as (...args: unknown[]) => void;
+    originalLogger.info = function () {
+      throw new Error('info fail');
+    } as (...args: unknown[]) => void;
+    originalLogger.warn = function () {
+      throw new Error('warn fail');
+    } as (...args: unknown[]) => void;
+    originalLogger.error = function () {
+      throw new Error('error fail');
+    } as (...args: unknown[]) => void;
 
     expect(() => logEvalStart('test.csv', 5)).not.toThrow();
     expect(() => logEvalComplete(0.9, 0.8)).not.toThrow();
