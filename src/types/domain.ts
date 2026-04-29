@@ -17,7 +17,7 @@ export const ClassificationResultSchema = z.object({
   predicted_label: z.string().min(1, 'predicted_label is required'),
   confidence: z.number().min(0).max(1).default(1.0),
   sample_id: z.string().uuid().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type ClassificationResult = z.infer<typeof ClassificationResultSchema>;
@@ -48,7 +48,7 @@ export const DatasetMetadataSchema = z.object({
   path: z.string().optional(),
   total_samples: z.number().min(0),
   labels: z.array(z.string()),
-  label_distribution: z.record(z.number()),
+  label_distribution: z.record(z.string(), z.number()),
   has_confidence: z.boolean(),
   loaded_at: z.string().datetime(),
 });
@@ -200,7 +200,7 @@ export const EvalRunSchema = z.object({
   started_at: z.string().datetime(),
   completed_at: z.string().datetime(),
   duration_ms: z.number().min(0),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type EvalRun = z.infer<typeof EvalRunSchema>;
@@ -272,8 +272,8 @@ export const CostAccountSchema = z.object({
   budget_limit: z.number().min(0),
   budget_remaining: z.number().min(0),
   budget_exceeded: z.boolean(),
-  cost_by_model: z.record(z.number()).default({}),
-  cost_by_category: z.record(z.number()).default({}),
+  cost_by_model: z.record(z.string(), z.number()).default({}),
+  cost_by_category: z.record(z.string(), z.number()).default({}),
 });
 
 export type CostAccount = z.infer<typeof CostAccountSchema>;
@@ -333,7 +333,7 @@ export const ExportTargetSchema = z.object({
   path: z.string().optional(),
   endpoint: z.string().url().optional(),
   dataset_name: z.string().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type ExportTarget = z.infer<typeof ExportTargetSchema>;
