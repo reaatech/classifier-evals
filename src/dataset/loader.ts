@@ -289,7 +289,9 @@ export async function loadDataset(
   try {
     content = await readFile(filePath, 'utf-8');
   } catch (err) {
-    throw new Error(`Failed to read dataset file "${filePath}": ${(err as Error).message}`);
+    throw new Error(`Failed to read dataset file "${filePath}": ${(err as Error).message}`, {
+      cause: err,
+    });
   }
 
   // Parse based on format

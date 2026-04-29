@@ -136,7 +136,7 @@ export class JudgeEngine {
     }
 
     let result: JudgedResult;
-    let tokensUsed = { input: 0, output: 0 };
+    let tokensUsed;
 
     if (this.config.customJudge) {
       result = await this.config.customJudge(prompt);

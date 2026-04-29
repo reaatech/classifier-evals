@@ -16,7 +16,9 @@ function loadBaselineEvalRun(baselinePath: string): EvalRun {
   try {
     return JSON.parse(readFileSync(baselinePath, 'utf8')) as EvalRun;
   } catch (err) {
-    throw new Error(`Failed to load baseline from "${baselinePath}": ${(err as Error).message}`);
+    throw new Error(`Failed to load baseline from "${baselinePath}": ${(err as Error).message}`, {
+      cause: err,
+    });
   }
 }
 

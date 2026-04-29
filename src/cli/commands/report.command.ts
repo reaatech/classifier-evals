@@ -51,6 +51,7 @@ export function reportCommand(program: Command): void {
         } catch (err) {
           throw new Error(
             `Failed to parse results file "${options.results}": ${(err as Error).message}`,
+            { cause: err },
           );
         }
 
