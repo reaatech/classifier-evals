@@ -52,7 +52,7 @@
     "@opentelemetry/sdk-metrics": "^1.25.0",
     "@opentelemetry/sdk-node": "^0.52.0",
     "commander": "^12.1.0",
-    "openai": "^4.70.0",
+    "openai": "^6.35.0",
     "pino": "^9.0.0",
     "yaml": "^2.4.0",
     "zod": "^3.23.0"
