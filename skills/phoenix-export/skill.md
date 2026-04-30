@@ -2,35 +2,35 @@
 
 ## Description
 
-Export evaluation results to Arize Phoenix for interactive analysis. Enables visualization of confusion matrices, embeddings, and evaluation traces in the Phoenix dashboard.
+Export evaluation results to Arize Phoenix for interactive analysis. Publishes evaluation metrics as OpenTelemetry traces with span attributes for visualization in the Phoenix dashboard.
+
+**Package:** `@reaatech/classifier-evals-exporters`
 
 ## Capabilities
 
-- **Dataset export**: Export eval results as Phoenix dataset
-- **Embeddings**: Export embedding vectors for dimensionality reduction
-- **Confusion matrix**: Export as Phoenix metrics for visualization
-- **Trace export**: Export LLM judge decisions as traces
-- **Metadata**: Include model version, timestamps, and custom metadata
+- **OTel trace export**: Entire eval run as a single trace with one span
+- **Full metrics**: All 14 ClassificationMetrics as span attributes
+- **Confusion matrix metadata**: Labels and class count as trace attributes
+- **HTTP transport**: POST to Phoenix API with configurable endpoint
+- **Authentication**: Bearer token via `PHOENIX_API_KEY` environment variable
+- **Timeout**: 30-second AbortController per request
+- **PII-safe**: Metadata is redacted before export
 
 ## Usage
 
 ### Library
 
 ```typescript
-import { PhoenixExporter } from 'classifier-evals';
+import { exportToPhoenix } from '@reaatech/classifier-evals-exporters';
 
-const exporter = new PhoenixExporter({
-  endpoint: 'http://localhost:6006',
-  dataset_name: 'intent-classifier-v2'
-});
-
-await exporter.export({
-  evalResults: results,
-  embeddings: embeddingVectors, // Optional
-  metadata: {
-    model: 'v2',
-    date: new Date().toISOString()
-  }
+await exportToPhoenix({
+  evalRun,
+  options: {
+    endpoint: 'http://localhost:6006',
+    datasetName: 'intent-classifier-v2',
+    apiKey: process.env.PHOENIX_API_KEY,
+    metadata: { model: 'v2', date: new Date().toISOString() },
+  },
 });
 ```
 
@@ -38,28 +38,26 @@ await exporter.export({
 
 ```bash
 # Export to Phoenix
-classifier-evals export --results results.json --target phoenix --endpoint http://localhost:6006
-
-# With embeddings
-classifier-evals export --results results.json --target phoenix --embeddings embeddings.npy
+classifier-evals export --results results.json --phoenix http://localhost:6006
 ```
 
 ## Configuration
 
-| Option | Description |
-|--------|-------------|
-| `endpoint` | Phoenix server endpoint (default: http://localhost:6006) |
-| `dataset_name` | Name for the exported dataset |
-| `embeddings` | Path to embedding vectors (numpy or parquet) |
-| `metadata` | Custom metadata key-value pairs |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `endpoint` | Phoenix server URL | `http://localhost:6006` |
+| `datasetName` | Name for the exported dataset/trace | `classifier-evals` |
+| `apiKey` | Bearer token for authentication | `PHOENIX_API_KEY` env var |
 
-## Embedding Formats
+## Exported Data
 
-- **NumPy**: `.npy` files with shape (n_samples, n_dimensions)
-- **Parquet**: Columnar format with embedding column
-- **CSV**: CSV with embedding as comma-separated values
+Each eval run produces one trace with a single span containing:
+- **Dataset info**: `dataset.name`, `dataset.path`, `dataset.total_samples`
+- **Full metrics**: `metrics.accuracy`, `metrics.f1_macro`, `metrics.f1_micro`, `metrics.precision_macro`, `metrics.precision_micro`, `metrics.precision_weighted`, `metrics.recall_macro`, `metrics.recall_micro`, `metrics.recall_weighted`, `metrics.f1_weighted`, `metrics.matthews_correlation`, `metrics.cohens_kappa`, `metrics.total_samples`, `metrics.correct_predictions`
+- **Confusion matrix**: `confusion_matrix.labels`, `confusion_matrix.num_classes`
+- **Custom metadata**: PII-redacted user-provided metadata
 
 ## Related Skills
 
+- `langfuse-export` — Langfuse observability trace export
 - `confusion-matrix` — Confusion matrix calculation
-- `langfuse-export` — Langfuse observability export

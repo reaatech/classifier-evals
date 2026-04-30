@@ -4,14 +4,17 @@
 
 Multi-format dataset ingestion and validation for classifier evaluation. This skill handles loading evaluation datasets from CSV, JSON, and JSONL files and validates them against the expected schema.
 
+**Package:** `@reaatech/classifier-evals-dataset`
+
 ## Capabilities
 
-- **Multi-format support**: CSV, JSON, and JSONL files
+- **Multi-format support**: CSV (RFC 4180), JSON, and JSONL files
 - **Auto-detection**: Automatically detects format from file extension
 - **Schema validation**: Validates required columns (text, label, predicted_label)
-- **Label distribution analysis**: Analyzes class distribution for imbalance detection
-- **Duplicate detection**: Identifies exact and fuzzy duplicates
-- **Empty/null handling**: Graceful handling of missing values
+- **Train/test splitting**: Random or stratified splits with reproducible seeding
+- **K-fold cross-validation**: Generates K train/test folds
+- **Label management**: Normalization, aliasing, unknown label handling, hierarchical labels
+- **Distribution analysis**: Class imbalance, duplicate detection, data leakage checks
 - **Confidence validation**: Validates confidence scores are in [0, 1] range
 
 ## Usage
@@ -19,17 +22,42 @@ Multi-format dataset ingestion and validation for classifier evaluation. This sk
 ### Library
 
 ```typescript
-import { loadDataset, validateDataset } from 'classifier-evals';
+import { loadDataset, validateDataset, splitDataset } from '@reaatech/classifier-evals-dataset';
 
 // Load a dataset
 const dataset = await loadDataset('path/to/dataset.csv');
 
-// Validate the dataset
+// Validate for common issues
 const validationResult = validateDataset(dataset);
 
-if (!validationResult.valid) {
-  console.error('Validation errors:', validationResult.errors);
+if (validationResult.warnings.length > 0) {
+  console.log('Warnings:', validationResult.warnings.map(w => w.message));
 }
+
+// Split into train/test (stratified by label)
+const { train, test } = splitDataset(dataset, {
+  testSize: 0.2,
+  stratify: true,
+  seed: 42,
+});
+```
+
+### Label Management
+
+```typescript
+import { normalizeLabels, applyLabelAliases } from '@reaatech/classifier-evals-dataset';
+
+// Normalize labels
+const normalized = normalizeLabels(dataset, {
+  lowercase: true,
+  normalizeSeparators: 'underscores',
+});
+
+// Map synonyms to canonical labels
+const mapped = applyLabelAliases(dataset, {
+  'password_reset': 'account',
+  'forgot_password': 'account',
+});
 ```
 
 ### CLI

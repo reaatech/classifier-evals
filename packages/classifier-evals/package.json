@@ -1,0 +1,50 @@
+{
+  "name": "@reaatech/classifier-evals",
+  "version": "0.1.0",
+  "description": "Canonical classifier evaluation types, schemas, utilities, and observability",
+  "license": "MIT",
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reaatech/classifier-evals.git",
+    "directory": "packages/classifier-evals"
+  },
+  "homepage": "https://github.com/reaatech/classifier-evals/tree/main/packages/classifier-evals#readme",
+  "bugs": {
+    "url": "https://github.com/reaatech/classifier-evals/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.215.0",
+    "@opentelemetry/sdk-metrics": "^2.7.0",
+    "pino": "^10.3.0",
+    "zod": "^4.3.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
+

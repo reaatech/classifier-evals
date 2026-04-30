@@ -1,356 +1,130 @@
 # classifier-evals
 
-Offline classifier evaluation harness for intent classification systems. Provides dataset loading, confusion matrices, LLM-as-judge with cost accounting, regression gates for CI, and Phoenix/Langfuse exporters.
+[![CI](https://github.com/reaatech/classifier-evals/actions/workflows/ci.yml/badge.svg)](https://github.com/reaatech/classifier-evals/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)](https://www.typescriptlang.org/)
 
-## Quick Start
+> Production-ready TypeScript evaluation suite for intent classification systems. Provides confusion matrices, LLM-as-judge with cost tracking, regression quality gates, MCP server integration, and Phoenix/Langfuse observability exporters.
 
-```bash
-# Install
-npm install -g classifier-evals
-
-# Run evaluation on a dataset
-classifier-evals eval --dataset test-set.csv --format json --output results.json
-
-# Check regression gates
-classifier-evals gates --results results.json --gates gates.yaml
-```
+This monorepo provides a complete offline evaluation harness for testing, debugging, and monitoring classifier models in CI pipelines and production workflows.
 
 ## Features
 
-- **Multi-format dataset loading** — CSV, JSON, JSONL
-- **Confusion matrix analysis** — Multi-class matrices with per-class metrics
-- **Classification metrics** — Accuracy, precision, recall, F1 (macro/micro/weighted), MCC, Cohen's kappa
-- **LLM-as-judge** — Cost-aware evaluation with consensus voting
-- **Regression gates** — CI-integrated quality gates with baseline comparison
-- **Observability** — Phoenix and Langfuse exporters, OpenTelemetry tracing
+- **Canonical types & validation** — Zod schemas for all evaluation concepts: classification results, confusion matrices, metrics, judge responses, gates, and export targets
+- **Multi-format dataset loader** — CSV (RFC 4180), JSON, and JSONL support with validation, train/test splitting, stratification, K-fold cross-validation, and label management
+- **Comprehensive metrics** — 14 classification metrics including macro/micro/weighted precision/recall/F1, Matthews Correlation Coefficient, and Cohen's Kappa
+- **LLM-as-judge** — multi-provider judge engine (Anthropic + OpenAI) with real-time cost tracking, consensus voting, custom prompt templates, and result aggregation
+- **Regression gates** — threshold, baseline-comparison, and distribution gates with GitHub Actions, JUnit, and PR-comment output formats for CI/CD integration
+- **Exporters** — JSON, HTML (SVG-based interactive reports), Arize Phoenix (OTel traces), and Langfuse (observability traces)
+- **MCP server** — expose evaluation tools (`run_eval`, `check_gates`, `compare_models`, `llm_judge`, `generate_report`) via the Model Context Protocol
+- **CLI** — Commander.js-based CLI with `eval`, `compare`, `gates`, `judge`, and `export` subcommands
+- **Observability** — Pino structured logging with PII redaction, OpenTelemetry tracing (pre-built spans), and Prometheus-compatible metrics
 
-## Dataset Format
+## Installation
 
-### CSV
+### Using the packages
 
-```csv
-text,label,predicted_label,confidence
-"Reset my password",password_reset,password_reset,0.95
-"Cancel my subscription",cancel_subscription,refund_request,0.72
-```
-
-### JSONL
-
-```jsonl
-{"text": "Reset my password", "label": "password_reset", "predicted_label": "password_reset", "confidence": 0.95}
-```
-
-### Required Fields
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `text` | yes | Input text that was classified |
-| `label` | yes | Ground truth label |
-| `predicted_label` | yes | Model's predicted label |
-| `confidence` | no | Model's confidence score (0-1) |
-
-## CLI Commands
-
-### eval
-
-Run a full evaluation pipeline:
+Packages are published under the `@reaatech` scope and can be installed individually:
 
 ```bash
-classifier-evals eval \
-  --dataset datasets/test-set.csv \
-  --format json \
-  --output results.json
+# Core types and schemas
+pnpm add @reaatech/classifier-evals
+
+# Dataset loading and validation
+pnpm add @reaatech/classifier-evals-dataset
+
+# Confusion matrix and classification metrics
+pnpm add @reaatech/classifier-evals-metrics
+
+# LLM-as-judge with cost tracking
+pnpm add @reaatech/classifier-evals-judge
+
+# Regression quality gates
+pnpm add @reaatech/classifier-evals-gates
+
+# JSON, HTML, Phoenix, and Langfuse exporters
+pnpm add @reaatech/classifier-evals-exporters
+
+# MCP server
+pnpm add @reaatech/classifier-evals-mcp-server
+
+# CLI tool
+pnpm add @reaatech/classifier-evals-cli
 ```
 
-### compare
-
-Compare two model evaluations:
+### Contributing
 
 ```bash
-classifier-evals compare \
-  --baseline results/model-v1.json \
-  --candidate results/model-v2.json \
-  --output comparison.json
+# Clone the repository
+git clone https://github.com/reaatech/classifier-evals.git
+cd classifier-evals
+
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run the test suite
+pnpm test
+
+# Run linting
+pnpm lint
+
+# Run type checking
+pnpm typecheck
 ```
 
-### gates
+## Quick Start
 
-Check regression gates for CI:
-
-```bash
-classifier-evals gates \
-  --results results/latest.json \
-  --gates gates.yaml
-```
-
-### judge
-
-Run LLM-as-judge on samples:
-
-```bash
-classifier-evals judge \
-  --samples misclassifications.jsonl \
-  --model claude-opus \
-  --budget 50.00
-```
-
-### export
-
-Generate a report or send results to an exporter:
-
-```bash
-classifier-evals export \
-  --results results/latest.json \
-  --format html \
-  --output reports/eval-report.html
-```
-
-## Regression Gates
-
-Configure quality gates in YAML:
-
-```yaml
-# gates.yaml
-gates:
-  - name: overall-accuracy
-    type: threshold
-    metric: accuracy
-    operator: ">="
-    threshold: 0.85
-
-  - name: macro-f1
-    type: threshold
-    metric: f1_macro
-    operator: ">="
-    threshold: 0.80
-
-  - name: no-regression
-    type: baseline-comparison
-    baseline_path: results/baseline.json
-    metric: f1_macro
-    allow_regression_in: 0
-```
-
-## CI Integration
-
-```yaml
-# .github/workflows/eval.yml
-name: Classifier Evaluation
-
-on:
-  pull_request:
-    branches: [main]
-
-jobs:
-  evaluate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Run evaluation
-        run: |
-          npx classifier-evals eval \
-            --dataset datasets/test-set.csv \
-            --output results.json
-      
-      - name: Check gates
-        run: |
-          npx classifier-evals gates \
-            --results results.json \
-            --gates gates.yaml
-```
-
-## Library Usage
+Evaluate a classifier on a CSV dataset in under 10 lines:
 
 ```typescript
-import { loadDataset, createEvalRunFromSamples } from 'classifier-evals';
+import { loadDataset } from "@reaatech/classifier-evals-dataset";
+import { calculateAllMetrics, buildConfusionMatrix } from "@reaatech/classifier-evals-metrics";
 
-// Load dataset
-const dataset = await loadDataset('test-set.csv');
+// Load and evaluate
+const dataset = await loadDataset("./test-set.csv");
+const metrics = calculateAllMetrics(dataset.samples);
+const cm = buildConfusionMatrix(dataset.samples);
 
-// Create evaluation run (computes confusion matrix and all metrics)
-const evalRun = createEvalRunFromSamples({
-  samples: dataset.samples,
-});
+console.log(`Accuracy: ${(metrics.accuracy * 100).toFixed(1)}%`);
+console.log(`Macro F1: ${(metrics.f1_macro * 100).toFixed(1)}%`);
 
-// Access results
-console.log(`Accuracy: ${evalRun.metrics.accuracy}`);
-console.log(`Macro F1: ${evalRun.metrics.f1_macro}`);
-console.log(`Confusion matrix labels: ${evalRun.confusion_matrix.labels}`);
+// Add LLM-as-judge
+import { createJudgeEngine } from "@reaatech/classifier-evals-judge";
+const judge = createJudgeEngine({ model: "claude-haiku", budgetLimit: 5.00 });
+const judged = await judge.evaluate(dataset.samples);
+
+// Check regression gates
+import { createGateEngine } from "@reaatech/classifier-evals-gates";
+const engine = createGateEngine();
+const gateResult = engine.evaluateGates(metrics, [
+  { name: "accuracy", type: "threshold", metric: "accuracy", operator: ">=", threshold: 0.85 },
+]);
+console.log(gateResult.passed ? "All gates passed" : "Some gates failed");
 ```
 
-## Environment Variables
+## Packages
 
-| Variable | Description |
-|----------|-------------|
-| `OPENAI_API_KEY` | OpenAI API key for LLM judge |
-| `ANTHROPIC_API_KEY` | Anthropic API key for LLM judge |
-| `LANGFUSE_PUBLIC_KEY` | Langfuse public key |
-| `LANGFUSE_SECRET_KEY` | Langfuse secret key |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | OpenTelemetry endpoint |
+| Package | Description |
+| ------- | ----------- |
+| [`@reaatech/classifier-evals`](./packages/classifier-evals) | Core types, Zod schemas, utilities, logging, OpenTelemetry, PII redaction |
+| [`@reaatech/classifier-evals-dataset`](./packages/dataset) | Multi-format dataset loading, validation, splitting, label management |
+| [`@reaatech/classifier-evals-metrics`](./packages/metrics) | Confusion matrix, 14 classification metrics, model comparison |
+| [`@reaatech/classifier-evals-judge`](./packages/judge) | LLM-as-judge with cost tracking, consensus voting, prompt templates |
+| [`@reaatech/classifier-evals-gates`](./packages/gates) | Regression quality gates for CI integration |
+| [`@reaatech/classifier-evals-exporters`](./packages/exporters) | JSON, HTML, Phoenix, and Langfuse exporters |
+| [`@reaatech/classifier-evals-mcp-server`](./packages/mcp-server) | MCP server exposing evaluation tools |
+| [`@reaatech/classifier-evals-cli`](./packages/cli) | Commander.js CLI with eval, compare, gates, judge, and export commands |
 
 ## Documentation
 
-- [AGENTS.md](AGENTS.md) — Agent development guide
-- [ARCHITECTURE.md](ARCHITECTURE.md) — System design deep dive
-- [DEV_PLAN.md](DEV_PLAN.md) — Development checklist
-
-## Performance Testing
-
-Run the opt-in large-dataset performance suite separately from the default unit tests:
-
-```bash
-npm run test:perf
-```
-
-The performance suite uses deterministic synthetic datasets and validates the real loader,
-metrics, and regression gate path on 10k+ samples.
-
-## Deployment
-
-### Infrastructure as Code
-
-The `infra/` directory contains Terraform modules and environment configurations for deploying
-classifier-evals to multiple cloud platforms:
-
-#### AWS (Amazon Web Services)
-
-Deploy to AWS using ECS Fargate:
-
-```bash
-cd infra/environments/aws-production
-terraform init
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
-```
-
-**Resources created:**
-- ECS Cluster with Fargate service
-- Application Load Balancer
-- ECR repository for container images
-- CloudWatch logs and alarms
-
-#### Azure
-
-Deploy to Azure using Container Apps:
-
-```bash
-cd infra/environments/azure-production
-terraform init
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
-```
-
-**Resources created:**
-- Container Apps Environment
-- Container App with autoscaling
-- Container Registry
-- Application Insights for monitoring
-
-#### GCP (Google Cloud Platform)
-
-Deploy to GCP using Cloud Run:
-
-```bash
-cd infra/environments/gcp-production
-terraform init
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
-```
-
-**Resources created:**
-- Cloud Run service
-- Cloud Build for CI/CD
-- Artifact Registry
-- Cloud Monitoring and Logging
-
-#### OCI (Oracle Cloud Infrastructure)
-
-Deploy to OCI using OKE (Kubernetes):
-
-```bash
-cd infra/environments/oci-production
-terraform init
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
-```
-
-**Resources created:**
-- OKE Kubernetes cluster
-- Load Balancer
-- Container Engine for Kubernetes
-- Monitoring and Logging
-
-#### Netlify
-
-Deploy to Netlify for serverless functions:
-
-```bash
-cd infra/environments/netlify-production
-terraform init
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
-```
-
-**Resources created:**
-- Netlify site
-- Serverless functions
-- Custom domain configuration
-- Build hooks for CI/CD
-
-#### Vercel
-
-Deploy to Vercel for edge functions:
-
-```bash
-cd infra/environments/vercel-production
-terraform init
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
-```
-
-**Resources created:**
-- Vercel project
-- Edge functions
-- Preview deployments
-- Custom domain configuration
-
-### Docker Deployment
-
-```bash
-# Build the Docker image
-docker build -t classifier-evals .
-
-# Run locally
-docker run -p 3000:3000 \
-  -e OPENAI_API_KEY=your-key \
-  -e ANTHROPIC_API_KEY=your-key \
-  classifier-evals
-
-# Push to registry
-docker tag classifier-evals registry.example.com/classifier-evals:latest
-docker push registry.example.com/classifier-evals:latest
-```
-
-### Docker Compose (Development)
-
-```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f classifier-evals
-
-# Stop all services
-docker-compose down
-```
-
-## Template Repository
-
-This repository can be used as a GitHub template, but the actual "Template repository"
-toggle is a GitHub repository setting and is not stored in source control. The repo-tracked
-support here is the project structure and documentation needed for template consumers.
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — System design, package relationships, and data flows
+- [`AGENTS.md`](./AGENTS.md) — Coding conventions and development guidelines
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — Contribution workflow and release process
+- [`datasets/examples/`](./datasets/examples/) — Sample datasets and gate configurations
 
 ## License
 
-MIT
+[MIT](LICENSE)

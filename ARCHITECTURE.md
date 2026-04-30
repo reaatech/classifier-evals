@@ -13,43 +13,90 @@
 │         └───────────────────┼───────────────────┘                         │
 │                             │                                               │
 └─────────────────────────────┼─────────────────────────────────────────────┘
-                              ▼
+                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         Evaluation Core                                  │
+│                    Monorepo Packages (pnpm workspace)                     │
+│                                                                          │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                      Eval Pipeline                                │   │
+│  │                     Eval Pipeline                                  │   │
 │  │                                                                   │   │
 │  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐           │   │
-│  │  │  Dataset    │───▶│   Metrics   │───▶│    LLM      │           │   │
-│  │  │   Loader    │    │   Engine    │    │   Judge     │           │   │
+│  │  │ @reaatech/  │───▶│ @reaatech/  │───▶│ @reaatech/  │           │   │
+│  │  │ -evals-     │    │ -evals-     │    │ -evals-     │           │   │
+│  │  │ dataset     │    │ metrics     │    │ judge       │           │   │
 │  │  └─────────────┘    └─────────────┘    └─────────────┘           │   │
 │  │         │                   │                   │                 │   │
 │  │         ▼                   ▼                   ▼                 │   │
 │  │  ┌─────────────────────────────────────────────────────────────┐  │   │
-│  │  │                    Regression Gates                          │  │   │
-│  │  │              (CI Quality Gates + Baseline Comparison)        │  │   │
+│  │  │           @reaatech/classifier-evals-gates                   │  │   │
+│  │  │            (CI Quality Gates + Baseline Comparison)          │  │   │
 │  │  └─────────────────────────────────────────────────────────────┘  │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │          @reaatech/classifier-evals (Core — Foundation Layer)     │   │
+│  │  ┌──────────────────┐  ┌──────────────────┐  ┌─────────────────┐ │   │
+│  │  │  Types + Zod      │  │  Observability   │  │   Utilities     │ │   │
+│  │  │  (domain.ts)      │  │  (logger, OTel,  │  │   (hash, PII,   │ │   │
+│  │  │  50+ schemas      │  │   dashboard)     │  │    eval-run)    │ │   │
+│  │  └──────────────────┘  └──────────────────┘  └─────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────┘
-                              ▼
+                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                          Exporters                                       │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │
 │  │   Phoenix   │  │   Langfuse  │  │    JSON     │  │    HTML     │    │
 │  │  (Traces)   │  │ (Sessions)  │  │  (Machine)  │  │  (Report)   │    │
 │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │
+│        @reaatech/classifier-evals-exporters                              │
 └─────────────────────────────────────────────────────────────────────────┘
-                              ▼
+                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                       Cross-Cutting Concerns                             │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐       │
-│  │    Cost Track    │  │   Observability  │  │  Reproducibility │       │
-│  │  - Per-request   │  │  - Tracing (OTel)│  │  - Seed mgmt     │       │
-│  │  - Budget track  │  │  - Metrics (OTel)│  │  - Deterministic │       │
-│  │  - Anomaly detect│  │  - Logging (pino)│  │  - Versioning    │       │
-│  └──────────────────┘  └──────────────────┘  └──────────────────┘       │
+│                    MCP Server + CLI                                      │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  @reaatech/classifier-evals-mcp-server   (5 MCP tools over stdio) │   │
+│  │  @reaatech/classifier-evals-cli          (Commander.js commands)  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Package Architecture
+
+### Package Dependency Graph
+
+```
+@reaatech/classifier-evals (no internal deps)
+  └── External only: zod, pino, @opentelemetry/*
+       │
+       ├─→ @reaatech/classifier-evals-dataset        (depends on core)
+       ├─→ @reaatech/classifier-evals-metrics        (depends on core)
+       ├─→ @reaatech/classifier-evals-judge          (depends on core)
+       │
+       ├─→ @reaatech/classifier-evals-gates          (depends on core, metrics)
+       ├─→ @reaatech/classifier-evals-exporters      (depends on core, metrics)
+       │
+       ├─→ @reaatech/classifier-evals-mcp-server     (depends on all above)
+       └─→ @reaatech/classifier-evals-cli            (depends on all above)
+```
+
+### Per-Package Build
+
+Each package uses **tsup** for building, configured identically:
+
+```json
+{
+  "build": "tsup src/index.ts --format cjs,esm --dts --clean"
+}
+```
+
+Output per package:
+- `dist/index.js` — ESM
+- `dist/index.cjs` — CJS
+- `dist/index.d.ts` — TypeScript declarations
+- `dist/index.d.cts` — CJS declarations
 
 ---
 
@@ -71,7 +118,7 @@
 - Fast gate evaluation with caching
 
 ### 4. Pluggable Architecture
-- Dataset loaders are swappable (CSV, JSON, Parquet)
+- Dataset loaders are swappable (CSV, JSON)
 - Metrics are extensible (add custom metrics)
 - Exporters are pluggable (Phoenix, Langfuse, custom)
 
@@ -84,94 +131,108 @@
 
 ## Component Deep Dive
 
-### Dataset Loader
+### Dataset Loader (`@reaatech/classifier-evals-dataset`)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      Dataset Loader                                  │
 │                                                                      │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐              │
-│  │    CSV      │    │   JSON/     │    │   Parquet   │              │
-│  │   Loader    │    │   JSONL     │    │   Loader    │              │
-│  │             │    │   Loader    │    │             │              │
-│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘              │
-│         │                  │                  │                       │
+│  ┌─────────────┐    ┌─────────────┐                                 │
+│  │    CSV      │    │   JSON/     │                                 │
+│  │   Loader    │    │   JSONL     │                                 │
+│  │  (RFC 4180) │    │   Loader    │                                 │
+│  └──────┬──────┘    └──────┬──────┘                                 │
+│         │                  │                                          │
 │         └──────────────────┼──────────────────┘                       │
 │                            ▼                                         │
 │                   ┌─────────────┐                                    │
 │                   │  Validator  │                                    │
 │                   │             │                                    │
 │                   │ - Schema    │                                    │
-│                   │ - Labels    │                                    │
+│                   │ - Label     │                                    │
+│                   │   distribution│                                  │
 │                   │ - Duplicates│                                    │
+│                   │ - Leakage   │                                    │
+│                   └─────────────┘                                    │
+│                            │                                         │
+│                   ┌─────────────┐                                    │
+│                   │  Splitter   │                                    │
+│                   │             │                                    │
+│                   │ - Train/test│                                    │
+│                   │ - Stratified│                                    │
+│                   │ - K-fold    │                                    │
+│                   └─────────────┘                                    │
+│                            │                                         │
+│                   ┌─────────────┐                                    │
+│                   │ Label       │                                    │
+│                   │ Manager     │                                    │
+│                   │             │                                    │
+│                   │ - Normalize │                                    │
+│                   │ - Aliases   │                                    │
+│                   │ - Unknown   │                                    │
+│                   │ - Hierarchy │                                    │
 │                   └─────────────┘                                    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Supported Formats:**
-- **CSV**: Standard comma-separated with header row
-- **JSON**: Array of objects or single object with array field
+- **CSV**: RFC 4180 compliant with quoted-field handling
+- **JSON**: Array of objects or object with `{ samples, data, results }` field
 - **JSONL**: Newline-delimited JSON (one sample per line)
-- **Parquet**: Columnar format for large datasets
 
 **Validation Steps:**
 1. Schema validation (required columns: text, label, predicted_label)
-2. Label distribution analysis (detect imbalance)
-3. Duplicate detection (exact and fuzzy)
-4. Empty/null value handling
-5. Confidence score range validation (0-1)
+2. Confidence score range validation (0-1)
+3. Label distribution analysis (imbalance detection)
+4. Duplicate detection (exact text matches)
+5. Data leakage detection (>95% accuracy on raw predictions)
 
-### Metrics Engine
+### Metrics Engine (`@reaatech/classifier-evals-metrics`)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      Metrics Engine                                  │
 │                                                                      │
-│  Input: EvalDataset { text, label, predicted_label, confidence? }   │
+│  Input: ClassificationResult[] { text, label, predicted_label, confidence }│
 │                                                                      │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐  │
 │  │  Confusion      │    │ Classification  │    │    Model        │  │
 │  │  Matrix         │    │    Metrics      │    │  Comparison     │  │
 │  │                 │    │                 │    │                 │  │
-│  │ - Multi-class   │    │ - Accuracy      │    │ - Paired t-test │  │
+│  │ - Multi-class   │    │ - Accuracy      │    │ - Accuracy diff │  │
 │  │ - Per-class     │    │ - Precision     │    │ - McNemar's     │  │
-│  │   TP/FP/FN/TN   │    │ - Recall        │    │ - Effect size   │  │
-│  │ - Normalized    │    │ - F1 (macro/    │    │                 │  │
-│  │   options       │    │ │   micro/      │    │                 │  │
-│  │                 │    │ │   weighted)   │    │                 │  │
-│  │                 │    │ - MCC           │    │                 │  │
+│  │   TP/FP/FN/TN   │    │ - Recall        │    │   p-value       │  │
+│  │ - Normalized    │    │ - F1 (macro/    │    │ - Effect size   │  │
+│  │   view (3 modes)│    │ │   micro/      │    │   (Cohen's d)   │  │
+│  │ - Top misclass  │    │ │   weighted)   │    │ - Per-class F1  │  │
+│  │ - Error rates   │    │ - MCC (Gorodkin)│    │   comparison    │  │
 │  │                 │    │ - Cohen's kappa │    │                 │  │
-│  │                 │    │ - Top-K acc     │    │                 │  │
+│  │                 │    │ - 14 metrics    │    │                 │  │
 │  └─────────────────┘    └─────────────────┘    └─────────────────┘  │
 │                                                                      │
-│  Output: EvalResults { confusion_matrix, metrics, comparison? }     │
+│  Also: eval-run.ts — createEvalRunFromSamples()                      │
+│        visualization-data.ts — heatmap, bar chart, cluster map       │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Confusion Matrix:**
 - Multi-class support (handles any number of classes)
 - Per-class TP/FP/FN/TN calculation
-- Row normalization (precision) and column normalization (recall) options
-- Sparse matrix representation for many classes
+- Row normalization (recall view), column normalization (precision view), overall normalization
+- Error rate per class, top misclassification pairs
 
-**Classification Metrics:**
+**Classification Metrics (14 total):**
 - **Accuracy**: Overall correct predictions
-- **Precision**: TP / (TP + FP) per class
-- **Recall**: TP / (TP + FN) per class
-- **F1 Score**: Harmonic mean of precision and recall
-- **Macro F1**: Unweighted mean across classes
-- **Micro F1**: Global TP/FP/FN aggregation
-- **Weighted F1**: Mean weighted by class support
-- **Matthews Correlation Coefficient**: Balanced measure for imbalanced classes
-- **Cohen's Kappa**: Inter-rater reliability
+- **Precision/Recall/F1**: Macro, micro, and weighted averages
+- **Matthews Correlation Coefficient**: Gorodkin (2004) generalized multi-class formula
+- **Cohen's Kappa**: Inter-rater reliability beyond chance
 
 **Model Comparison:**
-- Paired t-test for significance
-- McNemar's test for paired nominal data
-- Effect size calculation (Cohen's d)
-- Per-class improvement/regression analysis
+- Accuracy difference with McNemar's test p-value
+- Cohen's d effect size
+- Per-class F1 comparison with improvement/regression flags
 
-### LLM-as-Judge System
+### LLM-as-Judge System (`@reaatech/classifier-evals-judge`)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -181,13 +242,15 @@
 │  │   Judge     │    │   Prompt    │    │  Consensus  │              │
 │  │   Engine    │    │  Templates  │    │   Voting    │              │
 │  │             │    │             │    │             │              │
-│  │ - Batch     │    │ - Classif-  │    │ - Majority  │              │
-│  │   process   │    │ │ ication   │    │   voting    │              │
-│  │ - Parallel  │    │ │ -eval     │    │ - Weighted  │              │
-│  │   requests  │    │ │ -ambiguity│    │   voting    │              │
-│  │ - Rate      │    │ │ -detect   │    │ - Disagree- │              │
-│  │   limiting  │    │ │ -error-   │    │ │ ment      │              │
-│  │             │    │ │ │categorize│   │ │ detection │              │
+│  │ - Anthropic │    │ - classif-  │    │ - Majority  │              │
+│  │   + OpenAI  │    │ │ ication-  │    │   voting    │              │
+│  │ - Batch     │    │ │ eval      │    │ - Unanimous │              │
+│  │ - Parallel  │    │ │ -ambiguity│    │ - Weighted  │              │
+│  │ - Retry     │    │ │ -detect   │    │ - Disagree- │              │
+│  │             │    │ │ -error-   │    │ | ment      │              │
+│  │             │    │ │ |categorize│   │ | detection │              │
+│  │             │    │ │ -multi-   │    │             │              │
+│  │             │    │ │ |turn-eval│    │             │              │
 │  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘              │
 │         │                  │                  │                       │
 │         └──────────────────┼──────────────────┘                       │
@@ -201,34 +264,45 @@
 │                   │   tracking  │                                    │
 │                   │ - Alerts    │                                    │
 │                   └─────────────┘                                    │
+│                            │                                         │
+│                   ┌─────────────┐                                    │
+│                   │  Result     │                                    │
+│                   │ Aggregator  │                                    │
+│                   │             │                                    │
+│                   │ - Individual│                                    │
+│                   │ - Consensus │                                    │
+│                   │ - Reports   │                                    │
+│                   │ - JSON/CSV  │                                    │
+│                   └─────────────┘                                    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Judge Engine:**
-- Batch processing of evaluation samples
-- Parallel requests with configurable concurrency
-- Retry logic with exponential backoff
-- Timeout handling per request
+- Multi-provider support (Anthropic Claude + OpenAI GPT)
+- Batch processing with configurable concurrency
+- Exponential backoff retry on failures
+- Per-request timeout handling
+- PII redaction before sending to LLM
 
 **Prompt Templates:**
-- **classification-eval**: "Given the input text, ground truth label, and predicted label, determine if the prediction is correct."
-- **ambiguity-detection**: "Determine if this sample is ambiguous and could reasonably be labeled as multiple classes."
-- **error-categorization**: "Categorize the type of error: false positive, false negative, label noise, or genuine ambiguity."
-- **multi-turn-eval**: "Evaluate classification across a multi-turn conversation context."
+- `classification-eval` — "Is the predicted label correct?"
+- `ambiguity-detection` — "Is this sample ambiguous?"
+- `error-categorization` — "What type of error occurred?"
+- `multi-turn-eval` — "Is the classification correct in context?"
+- Custom templates registerable via `registerCustomTemplate()`
 
 **Consensus Voting:**
-- Majority voting across multiple LLM judges
-- Weighted voting by judge reliability (historical accuracy)
-- Disagreement detection and flagging
-- Cost vs accuracy tradeoff optimization
+- Majority voting across N judges
+- Weighted voting by judge reliability
+- Disagreement analysis and flagging
+- Optimal judge count estimation for budget constraints
 
 **Cost Tracking:**
-- Per-model cost calculation (input + output tokens)
-- Real-time budget tracking
-- Cost estimation before running
-- Budget alerts at configurable thresholds
+- Per-model token pricing (Claude Opus, Sonnet, Haiku; GPT-4, GPT-4-turbo, GPT-3.5)
+- Real-time budget tracking with limit enforcement
+- Cost accounting by model and category
 
-### Regression Gates
+### Regression Gates (`@reaatech/classifier-evals-gates`)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -238,38 +312,43 @@
 │  │   Threshold     │    │   Baseline      │    │  Distribution   │  │
 │  │     Gates       │    │  Comparison     │    │     Gates       │  │
 │  │                 │    │                 │    │                 │  │
-│  │ - Accuracy      │    │ - Compare to    │    │ - Label         │  │
-│  │   threshold     │    │ │ baseline      │    │ │ distribution  │  │
-│  │ - Per-class F1  │    │ │ - Statistical │    │ - Confidence    │  │
-│  │   thresholds    │    │ │ │ significance│    │ │ score dist    │  │
-│  │ - Macro/micro   │    │ │ - Regression  │    │ - Unknown rate  │  │
-│  │ │ F1 thresholds │    │ │ │ detection   │    │ - Ambiguity     │  │
-│  │                 │    │ │               │    │ │ rate          │  │
+│  │ - accuracy      │    │ - Compare to    │    │ - unknown_rate  │  │
+│  │ - f1_macro      │    │ | baseline      │    │ - label_card-   │  │
+│  │ - precision     │    │ | EvalRun       │    │ | inality       │  │
+│  │ - recall        │    │ - Per-class F1  │    │ - prediction_   │  │
+│  │ - mcc           │    │ | regression    │    │ | cardinality   │  │
+│  │ - kappa         │    │ | detection     │    │                 │  │
+│  │ - Any operator  │    │ - Allow_regress │    │                 │  │
+│  │                 │    │ :ion_in >= 0    │    │                 │  │
 │  └─────────────────┘    └─────────────────┘    └─────────────────┘  │
 │                                                                      │
-│  Output: GateResult { passed: boolean, failures: GateFailure[] }    │
+│  Gate Engine: caching, error handling, result aggregation            │
+│                                                                      │
+│  Output: GateResult { passed, gate, actual_value?, expected_value?  │
+│                        message?, failures? }                         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Threshold Gates:**
-- Overall accuracy threshold
-- Per-class F1 thresholds
-- Macro/micro F1 thresholds
-- Confidence score distribution checks
+- Any ClassificationMetrics scalar with configurable operator (`>=`, `<=`, `>`, `<`, `==`)
+- YAML-based configuration loading
 
 **Baseline Comparison:**
-- Compare against baseline model results
-- Statistical significance testing (paired tests)
-- Regression detection (any class degraded beyond threshold)
-- Improvement requirements (must improve X classes by Y%)
+- Compare `f1_per_class` against persisted baseline `EvalRun`
+- Allow a configurable number of per-class regressions
+- Compare scalar metrics with operator-based threshold
 
 **Distribution Gates:**
-- Label distribution drift detection (KL divergence)
-- Confidence score distribution checks
-- Unknown rate threshold
-- Ambiguity rate threshold
+- Check `unknown_rate` from `evalRun.metadata.distribution_metrics`
+- Extensible to any distribution metric stored in metadata
 
-### Exporters
+**CI Integration:**
+- GitHub Actions annotations (`::error::` format)
+- JUnit XML for CI test report consumption
+- PR comment markdown generation
+- Exit code 0 (pass) / 1 (fail) for CI pipelines
+
+### Exporters (`@reaatech/classifier-evals-exporters`)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -279,52 +358,54 @@
 │  │   Phoenix   │    │   Langfuse  │    │    JSON     │              │
 │  │  Exporter   │    │  Exporter   │    │  Exporter   │              │
 │  │             │    │             │    │             │              │
-│  │ - Dataset   │    │ - Traces    │    │ - Full      │              │
-│  │ │ export    │    │ - Scores    │    │ │ results   │              │
-│  │ - Embeddings│    │ - Observ-   │    │ - Summary   │              │
-│  │ - Metrics   │    │ │ ations    │    │ │ stats     │              │
-│  │             │    │ - Sessions  │    │ - Machine   │              │
-│  │             │    │ │           │    │ │ readable  │              │
+│  │ - OTel      │    │ - Traces    │    │ - Full      │              │
+│  │   trace     │    │ - Sessions  │    │   results   │              │
+│  │ - Span      │    │ - HTTP      │    │ - PII-safe  │              │
+│  │   attributes│    │   auth      │    │   (redacted)│              │
+│  │ - HTTP POST │    │ - Fetch()   │    │ - Machine   │              │
+│  │   transport │    │             │    │   readable  │              │
 │  └─────────────┘    └─────────────┘    └─────────────┘              │
 │                                                                      │
 │  ┌─────────────┐                                                    │
 │  │    HTML     │                                                    │
 │  │  Exporter   │                                                    │
 │  │             │                                                    │
-│  │ - Interactive                                                    │
-│  │ │ confusion                                                    │
-│  │ │ matrix                                                       │
-│  │ - Per-class                                                    │
-│  │ │ metrics                                                     │
-│  │ - Baseline                                                    │
-│  │ │ comparison                                                │
+│  │ - SVG       │                                                    │
+│  │   heatmap   │                                                    │
+│  │ - SVG bar   │                                                    │
+│  │   charts    │                                                    │
+│  │ - Metrics   │                                                    │
+│  │   dashboard │                                                    │
+│  │ - Gate      │                                                    │
+│  │   results   │                                                    │
 │  └─────────────┘                                                    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Phoenix Exporter:**
-- Export eval results as Phoenix dataset
-- Embedding export for dimensionality reduction visualization
-- Confusion matrix as Phoenix metrics
-- Trace export for LLM judge decisions
-
-**Langfuse Exporter:**
-- Export eval runs as Langfuse traces
-- Score export for quality metrics
-- Observation export for individual predictions
-- Session grouping by eval run
-
 **JSON Exporter:**
-- Full eval results in machine-readable JSON
-- Summary statistics
-- Per-class breakdown
-- Metadata for downstream processing
+- Full eval results in structured JSON
+- PII-redacted metadata
+- Optional sample inclusion
+- Judge results summary
 
 **HTML Exporter:**
-- Interactive confusion matrix heatmap
-- Per-class metric charts
-- Comparison with baseline (if available)
-- LLM judge agreement analysis
+- Self-contained HTML with inline SVGs (no CDN)
+- Confusion matrix heatmap with color-coded cells
+- Per-class grouped bar charts
+- Metrics dashboard with key numbers
+- Gate results and judge results sections (when present)
+
+**Phoenix Exporter:**
+- OTel trace with full metrics as span attributes
+- HTTP POST transport with configurable endpoint
+- Auth via `Authorization: Bearer` header
+- 30-second timeout with AbortController
+
+**Langfuse Exporter:**
+- Trace ingestion via Langfuse public API
+- HTTP Basic Authentication
+- Structured input/output/metadata
+- Session grouping by eval run
 
 ---
 
@@ -333,36 +414,33 @@
 ### Complete Evaluation Flow
 
 ```
-1. Load dataset (CSV/JSON/Parquet)
-        │
+1. Load dataset (CSV/JSON/JSONL)
+   │  @reaatech/classifier-evals-dataset
+   │
 2. Validate dataset:
-   - Schema validation
-   - Label distribution
-   - Duplicate detection
-        │
+   - Schema validation, label distribution, duplicates, leakage
+   │
 3. Calculate confusion matrix:
-   - Multi-class matrix
-   - Per-class TP/FP/FN/TN
-        │
+   - Multi-class matrix, per-class TP/FP/FN/TN
+   │  @reaatech/classifier-evals-metrics
+   │
 4. Calculate classification metrics:
-   - Accuracy, precision, recall, F1
-   - Macro/micro/weighted averages
-        │
+   - 14 metrics including macro/micro/weighted, MCC, Cohen's kappa
+   │
 5. (Optional) Run LLM-as-judge:
-   - Batch process samples
-   - Track costs
-   - Consensus voting
-        │
+   - Batch process, cost tracking, consensus voting
+   │  @reaatech/classifier-evals-judge
+   │
 6. Evaluate regression gates:
-   - Threshold checks
-   - Baseline comparison
-   - Distribution checks
-        │
+   - Threshold, baseline comparison, distribution gates
+   │  @reaatech/classifier-evals-gates
+   │
 7. Export results:
-   - JSON/HTML reports
-   - Phoenix/Langfuse
-        │
-8. Log and trace complete run
+   - JSON, HTML, Phoenix, Langfuse
+   │  @reaatech/classifier-evals-exporters
+   │
+8. Log and trace complete run (OpenTelemetry)
+    @reaatech/classifier-evals (observability)
 ```
 
 ---
@@ -374,23 +452,23 @@
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │ Layer 1: Data                                                        │
-│ - PII redaction in all logs                                         │
-│ - Hash sensitive identifiers                                        │
+│ - PII redaction in all logs (credit cards, emails, phones, SSNs, IPs)│
+│ - Hash sensitive identifiers (SHA-256)                              │
 │ - Never log raw text from datasets                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │ Layer 2: API Keys                                                    │
 │ - All LLM API keys from environment variables                       │
-│ - Never log API keys or tokens                                      │
-│ - Separate keys per provider                                        │
+│ - Never log API keys or tokens (pino redaction)                     │
+│ - Separate keys per provider (Anthropic, OpenAI)                    │
 ├─────────────────────────────────────────────────────────────────────┤
 │ Layer 3: Cost Controls                                               │
-│ - Budget limits enforced                                            │
+│ - Budget limits enforced (soft and hard)                            │
 │ - Cost estimation before expensive operations                       │
 │ - Real-time cost monitoring with alerts                             │
 ├─────────────────────────────────────────────────────────────────────┤
 │ Layer 4: Export Security                                             │
-│ - PII sanitization before export                                    │
-│ - Configurable data retention                                       │
+│ - PII sanitization before export (JSON, Phoenix)                    │
+│ - Configurable sample inclusion (off by default)                    │
 │ - Secure transport (HTTPS) for remote exporters                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -401,6 +479,7 @@
 - User identifiers are hashed before logging
 - Exports are sanitized to remove PII
 - Configurable PII patterns for redaction
+- Prompt injection sanitization before LLM calls
 
 ---
 
@@ -410,13 +489,13 @@
 
 Every evaluation run generates OpenTelemetry spans:
 
-| Span | Attributes |
-|------|------------|
-| `eval.run` | dataset, samples, model |
-| `dataset.load` | format, path, rows |
-| `metrics.calculate` | metric_types, duration |
-| `judge.evaluate` | model, samples, cost |
-| `gates.check` | gate_count, passed |
+| Span | Attributes | Source |
+|------|------------|--------|
+| `eval.run` | dataset, samples, model | `@reaatech/classifier-evals` |
+| `dataset.load` | format, path | `@reaatech/classifier-evals` |
+| `metrics.calculate` | metrics.types | `@reaatech/classifier-evals` |
+| `judge.evaluate` | model, samples | `@reaatech/classifier-evals` |
+| `gates.check` | gates.count | `@reaatech/classifier-evals` |
 
 ### Metrics
 
@@ -432,22 +511,18 @@ Every evaluation run generates OpenTelemetry spans:
 
 ### Logging
 
-All logs are structured JSON with standard fields:
+All logs are structured JSON with Pino and automatic redaction of secrets:
 
 ```json
 {
-  "timestamp": "2026-04-15T23:00:00Z",
+  "level": "info",
   "service": "classifier-evals",
   "eval_run_id": "eval-123",
-  "level": "info",
-  "message": "Evaluation completed",
-  "dataset": "test-set.csv",
-  "samples": 1000,
+  "event": "eval.complete",
   "accuracy": 0.87,
   "f1_macro": 0.84,
   "judge_cost": 12.34,
-  "gates_passed": true,
-  "duration_ms": 4523
+  "gates_passed": true
 }
 ```
 
@@ -459,48 +534,42 @@ All logs are structured JSON with standard fields:
 |---------|-----------|----------|
 | Dataset load error | File not found, parse error | Return detailed error, suggest fixes |
 | Invalid schema | Missing required columns | List missing columns, show expected schema |
-| LLM API error | Non-2xx response | Retry with backoff, skip sample, continue |
+| LLM API error | Non-2xx response | Retry with exponential backoff, skip sample |
 | Budget exceeded | Cost > budget limit | Stop judge, return partial results |
-| Gate evaluation error | Invalid gate config | Log error, fail open (pass) with warning |
+| Gate evaluation error | Invalid gate config | Log error, fail open with warning |
 | Export error | Network/storage failure | Log error, continue with other exports |
 | Timeout | Request exceeds timeout | Return partial results, log warning |
 
 ---
 
-## Deployment Architecture
-
-### GCP Cloud Run
+## Repository Structure
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Cloud Run Service                            │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │                   classifier-evals Container                 │    │
-│  │  ┌───────────┐  ┌───────────┐  ┌───────────┐                │    │
-│  │  │ Eval      │  │ OTel      │  │ Secrets   │                │    │
-│  │  │ Engine    │  │ Sidecar   │  │ Mounted   │                │    │
-│  │  └───────────┘  └───────────┘  └───────────┘                │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│                                                                      │
-│  Config:                                                             │
-│  - Min instances: 0 (scale to zero)                                 │
-│  - Max instances: 5 (configurable)                                  │
-│  - Memory: 1GB, CPU: 1 vCPU                                         │
-│  - Timeout: 300s (for large evals)                                  │
-│                                                                      │
-│  Secrets: Secret Manager → mounted as env vars                       │
-│  Observability: OTel → Cloud Monitoring / Datadog                    │
-│  Storage: GCS for datasets and results                              │
-└─────────────────────────────────────────────────────────────────────┘
+classifier-evals/
+  .changeset/           — Changesets config
+  .github/
+    workflows/
+      ci.yml            — Install → Audit → Format → Lint → Typecheck → Build → Test → Coverage → Docker → All-checks
+      release.yml       — Changesets-based npm + GitHub Packages publish
+      eval.yml          — Classifier eval + gate check on PRs
+  packages/
+    classifier-evals/   — Core: types, schemas, observability, PII redaction, eval-run persistence
+    dataset/            — Dataset: loader, validator, splitter, label manager
+    metrics/            — Metrics: confusion matrix, 14 metrics, comparison, eval-run construction
+    judge/              — Judge: judge engine, cost tracker, prompt templates, consensus voting
+    gates/              — Gates: gate engine, threshold, baseline, distribution, CI integration
+    exporters/          — Exporters: JSON, HTML, Phoenix, Langfuse
+    mcp-server/         — MCP server + 5 tool implementations
+    cli/                — CLI entry point + 5 command implementations
+  datasets/             — Sample datasets and gate configurations
+  skills/               — Skill documentation for each package
+  docker/               — Docker Compose configurations
+  infra/                — Terraform IaC
 ```
-
----
 
 ## References
 
-- **AGENTS.md** — Agent development guide
-- **DEV_PLAN.md** — Development checklist
+- **AGENTS.md** — Agent development guide with coding conventions
 - **README.md** — Quick start and overview
 - **datasets/examples/** — Example datasets and configurations
 - **MCP Specification** — https://modelcontextprotocol.io/
-- **agent-mesh/AGENTS.md** — Multi-agent orchestration patterns

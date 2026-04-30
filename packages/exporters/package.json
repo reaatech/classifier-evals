@@ -1,0 +1,47 @@
+{
+  "name": "@reaatech/classifier-evals-exporters",
+  "version": "0.1.0",
+  "description": "Exporters for classifier evaluation results (JSON, HTML, Phoenix, Langfuse)",
+  "license": "MIT",
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reaatech/classifier-evals.git",
+    "directory": "packages/exporters"
+  },
+  "homepage": "https://github.com/reaatech/classifier-evals/tree/main/packages/exporters#readme",
+  "bugs": {
+    "url": "https://github.com/reaatech/classifier-evals/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@reaatech/classifier-evals": "workspace:*",
+    "@reaatech/classifier-evals-metrics": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
+

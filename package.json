@@ -1,21 +1,22 @@
 {
   "name": "classifier-evals",
   "version": "0.1.0",
-  "description": "Offline classifier evaluation harness for intent classification systems with confusion matrices, LLM-as-judge, regression gates, and Phoenix/Langfuse exporters",
-  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
-  "license": "MIT",
+  "private": true,
+  "description": "Enterprise-grade classifier evaluation suite for intent classification systems with confusion matrices, LLM-as-judge, regression gates, and Phoenix/Langfuse exporters",
   "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
-  "bin": {
-    "classifier-evals": "dist/src/cli.js"
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "turbo run build && changeset publish"
   },
-  "files": [
-    "dist/src/**/*",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
-  ],
   "keywords": [
     "classifier",
     "evaluation",
@@ -28,57 +29,28 @@
     "phoenix",
     "langfuse"
   ],
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist coverage",
-    "dev": "npm run build && node --enable-source-maps dist/src/cli.js",
-    "lint": "eslint src tests",
-    "format": "prettier --write src tests",
-    "format:check": "prettier --check src tests",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:perf": "vitest run --config vitest.perf.config.ts",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "prepare": "husky || true",
-    "precommit": "lint-staged"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.30.0",
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.215.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "^0.215.0",
-    "@opentelemetry/sdk-metrics": "^2.7.0",
-    "@opentelemetry/sdk-node": "^0.215.0",
-    "commander": "^14.0.0",
-    "openai": "^6.35.0",
-    "pino": "^10.3.0",
-    "yaml": "^2.4.0",
-    "zod": "^4.3.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^25.6.0",
-    "@vitest/coverage-v8": "^4.1.0",
-    "eslint": "^10.2.0",
-    "globals": "^17.5.0",
-    "husky": "^9.0.0",
-    "lint-staged": "^16.4.0",
-    "prettier": "^3.2.0",
-    "typescript": "^6.0.0",
-    "typescript-eslint": "^8.0.0",
-    "vitest": "^4.1.0"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
+  "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
+  "license": "MIT",
+  "packageManager": "pnpm@10.22.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/reaatech/classifier-evals.git"
   },
-  "homepage": "https://github.com/reaatech/classifier-evals#readme",
   "bugs": {
     "url": "https://github.com/reaatech/classifier-evals/issues"
+  },
+  "homepage": "https://github.com/reaatech/classifier-evals#readme",
+  "pnpm": {
+    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild", "protobufjs"]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.28.1",
+    "@vitest/coverage-v8": "3.2.4",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   }
 }
+
