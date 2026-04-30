@@ -22,4 +22,3 @@ describe('utility helpers', () => {
     expect(JSON.stringify(redacted)).toContain('[IP_REDACTED]');
   });
 });
-
