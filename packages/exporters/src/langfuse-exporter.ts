@@ -60,7 +60,7 @@ async function sendToLangfuse(
       body: JSON.stringify({
         batch: events,
       }),
-      signal: controller.signal,
+      signal: controller.signal as AbortSignal,
     });
 
     if (!response.ok) {
