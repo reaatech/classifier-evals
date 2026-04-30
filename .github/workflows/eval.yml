@@ -30,16 +30,18 @@ jobs:
       - name: Run evaluation
         run: |
           mkdir -p results
-          pnpm --filter @reaatech/classifier-evals-cli exec classifier-evals eval \
-            --dataset datasets/examples/sample.csv \
+          cd packages/cli
+          node dist/cli.js eval \
+            --dataset ../../datasets/examples/sample.csv \
             --format json \
-            --output results/latest.json
+            --output ../../results/latest.json
 
       - name: Check regression gates
         run: |
-          pnpm --filter @reaatech/classifier-evals-cli exec classifier-evals gates \
-            --results results/latest.json \
-            --gates datasets/examples/gates.yaml
+          cd packages/cli
+          node dist/cli.js gates \
+            --results ../../results/latest.json \
+            --gates ../../datasets/examples/gates.yaml
 
       - name: Upload evaluation results
         if: always()
