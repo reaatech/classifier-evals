@@ -64,7 +64,7 @@ async function sendToPhoenix(
         dataset_name: datasetName,
         traces,
       }),
-      signal: controller.signal,
+      signal: controller.signal as AbortSignal,
     });
 
     if (!response.ok) {
