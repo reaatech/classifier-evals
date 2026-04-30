@@ -22,71 +22,121 @@ judging, and CI-integrated quality gates.
 
 ---
 
+## Monorepo Structure
+
+This project is a **pnpm monorepo** with 8 packages under `packages/`, using
+Turborepo for orchestration, Biome for linting/formatting, and Changesets for
+versioning.
+
+```
+classifier-evals/
+  packages/
+    classifier-evals/    →  @reaatech/classifier-evals          (core types, schemas, observability)
+    dataset/             →  @reaatech/classifier-evals-dataset   (loader, validator, splitter, labels)
+    metrics/             →  @reaatech/classifier-evals-metrics   (confusion matrix, metrics, comparison)
+    judge/               →  @reaatech/classifier-evals-judge     (LLM judge, cost tracking, consensus)
+    gates/               →  @reaatech/classifier-evals-gates     (regression gates, CI integration)
+    exporters/           →  @reaatech/classifier-evals-exporters (JSON, HTML, Phoenix, Langfuse)
+    mcp-server/          →  @reaatech/classifier-evals-mcp-server(MCP tools)
+    cli/                 →  @reaatech/classifier-evals-cli       (CLI commands)
+  datasets/
+  skills/
+  docker/
+  infra/
+```
+
+### Package Dependency Graph
+
+```
+@reaatech/classifier-evals (no internal deps)
+ ├─→ @reaatech/classifier-evals-dataset
+ ├─→ @reaatech/classifier-evals-metrics
+ ├─→ @reaatech/classifier-evals-judge
+ ├─→ @reaatech/classifier-evals-gates ──→ metrics
+ ├─→ @reaatech/classifier-evals-exporters ──→ core, metrics
+ ├─→ @reaatech/classifier-evals-mcp-server ──→ all above
+ └─→ @reaatech/classifier-evals-cli ──→ all above
+```
+
+### Tooling
+
+| Tool | Purpose |
+|------|---------|
+| **pnpm** | Package manager with workspaces (`pnpm-workspace.yaml`) |
+| **Turborepo** | Task orchestration (`turbo.json`) |
+| **Biome** | Linting + formatting (`biome.json`) |
+| **Changesets** | Versioning + CHANGELOG (`.changeset/`) |
+| **tsup** | Per-package build (dual ESM/CJS) |
+| **vitest** | Per-package test runner |
+
+---
+
 ## Architecture Overview
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Eval Dataset   │────▶│  classifier-evals │────▶│   Metrics &    │
-│  (CSV/JSONL)    │     │   (Eval Engine)   │     │   Reports      │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │   LLM-as-Judge   │
-                       │   + Cost Track   │
-                       └──────────────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │  Regression      │
-                       │  Gates for CI    │
-                       └──────────────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │  Phoenix/        │
-                       │  Langfuse        │
-                       └──────────────────┘
+┌─────────────────┐     ┌──────────────────────────┐     ┌─────────────────┐
+│  Eval Dataset   │────▶│   @reaatech/             │────▶│   Metrics &    │
+│  (CSV/JSONL)    │     │   classifier-evals-*     │     │   Reports      │
+└─────────────────┘     │   (Eval Engine)          │     └─────────────────┘
+                        └──────────────────────────┘
+                                 │
+                                 ▼
+                        ┌──────────────────┐
+                        │   LLM-as-Judge   │
+                        │   + Cost Track   │
+                        └──────────────────┘
+                                 │
+                                 ▼
+                        ┌──────────────────┐
+                        │  Regression      │
+                        │  Gates for CI    │
+                        └──────────────────┘
+                                 │
+                                 ▼
+                        ┌──────────────────┐
+                        │  Phoenix/        │
+                        │  Langfuse        │
+                        └──────────────────┘
 ```
 
 ### Key Components
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| **Dataset Loader** | `src/dataset/` | Multi-format dataset loading and validation |
-| **Metrics Engine** | `src/metrics/` | Confusion matrix and classification metrics |
-| **LLM Judge** | `src/judge/` | LLM-as-judge with cost tracking |
-| **Regression Gates** | `src/gates/` | CI quality gates with threshold enforcement |
-| **Exporters** | `src/exporters/` | Phoenix, Langfuse, JSON, HTML export |
-| **MCP Server** | `src/mcp-server/` | Expose eval tools via MCP protocol |
+| Component | Package | Purpose |
+|-----------|---------|---------|
+| **Dataset Loader** | `@reaatech/classifier-evals-dataset` | Multi-format dataset loading and validation |
+| **Metrics Engine** | `@reaatech/classifier-evals-metrics` | Confusion matrix and classification metrics |
+| **LLM Judge** | `@reaatech/classifier-evals-judge` | LLM-as-judge with cost tracking |
+| **Regression Gates** | `@reaatech/classifier-evals-gates` | CI quality gates with threshold enforcement |
+| **Exporters** | `@reaatech/classifier-evals-exporters` | Phoenix, Langfuse, JSON, HTML export |
+| **MCP Server** | `@reaatech/classifier-evals-mcp-server` | Expose eval tools via MCP protocol |
+| **CLI** | `@reaatech/classifier-evals-cli` | Commander.js CLI for all eval operations |
+| **Core** | `@reaatech/classifier-evals` | Types, Zod schemas, observability, PII redaction |
 
 ---
 
 ## Skill System
 
 Skills represent the atomic capabilities of the evaluation system. Each skill
-corresponds to a component of the evaluation pipeline.
+corresponds to a package in the monorepo.
 
 ### Available Skills
 
-| Skill ID | File | Description |
-|----------|------|-------------|
-| `dataset-loading` | `skills/dataset-loading/skill.md` | Multi-format dataset ingestion and validation |
-| `confusion-matrix` | `skills/confusion-matrix/skill.md` | Confusion matrix calculation and metrics |
-| `llm-as-judge` | `skills/llm-as-judge/skill.md` | LLM-based evaluation with cost tracking |
-| `regression-gates` | `skills/regression-gates/skill.md` | CI integration with quality gates |
-| `phoenix-export` | `skills/phoenix-export/skill.md` | Arize Phoenix trace export |
-| `langfuse-export` | `skills/langfuse-export/skill.md` | Langfuse observability export |
+| Skill ID | File | Package |
+|----------|------|---------|
+| `dataset-loading` | `skills/dataset-loading/skill.md` | `@reaatech/classifier-evals-dataset` |
+| `confusion-matrix` | `skills/confusion-matrix/skill.md` | `@reaatech/classifier-evals-metrics` |
+| `llm-as-judge` | `skills/llm-as-judge/skill.md` | `@reaatech/classifier-evals-judge` |
+| `regression-gates` | `skills/regression-gates/skill.md` | `@reaatech/classifier-evals-gates` |
+| `phoenix-export` | `skills/phoenix-export/skill.md` | `@reaatech/classifier-evals-exporters` |
+| `langfuse-export` | `skills/langfuse-export/skill.md` | `@reaatech/classifier-evals-exporters` |
 
 ---
 
 ## MCP Integration
 
-The evaluation harness exposes MCP tools for agent integration:
+The MCP server (`@reaatech/classifier-evals-mcp-server`) exposes 5 tools:
 
 ### run_eval Tool
-
-Execute a full evaluation pipeline:
 
 ```json
 {
@@ -104,8 +154,6 @@ Execute a full evaluation pipeline:
 
 ### compare_models Tool
 
-Compare two model evaluations:
-
 ```json
 {
   "name": "compare_models",
@@ -117,8 +165,6 @@ Compare two model evaluations:
 ```
 
 ### check_gates Tool
-
-Evaluate regression gates for CI:
 
 ```json
 {
@@ -133,8 +179,6 @@ Evaluate regression gates for CI:
 
 ### llm_judge Tool
 
-Run LLM-as-judge on samples:
-
 ```json
 {
   "name": "llm_judge",
@@ -143,6 +187,18 @@ Run LLM-as-judge on samples:
     "judge_model": "claude-opus",
     "consensus_count": 3,
     "budget_limit": 10.00
+  }
+}
+```
+
+### generate_report Tool
+
+```json
+{
+  "name": "generate_report",
+  "arguments": {
+    "eval_results": "results/latest.json",
+    "format": "html"
   }
 }
 ```
@@ -181,37 +237,8 @@ text,label,predicted_label,confidence
 
 ## LLM-as-Judge
 
-### Configuration
-
-```yaml
-# judge-config.yaml
-judge:
-  model: claude-opus
-  prompt_template: classification-eval
-  consensus_count: 3
-  max_cost_per_sample: 0.05
-  budget_limit: 50.00
-  retry_count: 3
-  timeout_ms: 30000
-```
-
-### Prompt Templates
-
-The system includes built-in prompt templates:
-
-| Template | Purpose |
-|----------|---------|
-| `classification-eval` | Evaluate if prediction matches ground truth |
-| `ambiguity-detection` | Detect if sample is ambiguous |
-| `error-categorization` | Categorize the type of error |
-| `multi-turn-eval` | Evaluate multi-turn conversation classification |
-
-### Cost Tracking
-
-The judge tracks costs in real-time:
-
 ```typescript
-import { createJudgeEngine } from 'classifier-evals';
+import { createJudgeEngine } from '@reaatech/classifier-evals-judge';
 
 const judge = createJudgeEngine({
   model: 'claude-opus',
@@ -225,18 +252,24 @@ console.log(`Samples judged: ${result.samplesProcessed}`);
 console.log(`Agreement rate: ${result.agreementRate}`);
 ```
 
+### Prompt Templates
+
+| Template | Purpose |
+|----------|---------|
+| `classification-eval` | Evaluate if prediction matches ground truth |
+| `ambiguity-detection` | Detect if sample is ambiguous |
+| `error-categorization` | Categorize the type of error |
+| `multi-turn-eval` | Evaluate multi-turn conversation classification |
+
 ### Consensus Voting
 
-For higher accuracy, use multiple judges:
+```typescript
+import { executeConsensusVoting } from '@reaatech/classifier-evals-judge';
 
-```yaml
-judge:
-  models:
-    - claude-opus
-    - gpt-4-turbo
-    - gemini-pro
-  voting_strategy: majority
-  tie_breaker: highest_confidence
+const result = await executeConsensusVoting(sample, [judge1, judge2, judge3], {
+  votingStrategy: 'majority',
+  tieBreaker: 'highest_confidence',
+});
 ```
 
 ---
@@ -264,7 +297,7 @@ gates:
     type: baseline-comparison
     baseline: results/baseline.json
     metric: f1_per_class
-    allow_regression_in: 0  # No class can regress
+    allow_regression_in: 0
 
   - name: unknown-rate
     type: distribution
@@ -288,20 +321,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
       - name: Run evaluation
         run: |
-          npx classifier-evals eval \
-            --dataset datasets/test-set.csv \
+          mkdir -p results
+          pnpm --filter @reaatech/classifier-evals-cli exec classifier-evals eval \
+            --dataset datasets/examples/sample.csv \
             --format json \
-            --output results.json
-      
+            --output results/latest.json
+
       - name: Check gates
         run: |
-          npx classifier-evals gates \
-            --results results.json \
-            --gates gates.yaml
-          
+          pnpm --filter @reaatech/classifier-evals-cli exec classifier-evals gates \
+            --results results/latest.json \
+            --gates datasets/examples/gates.yaml
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
@@ -324,48 +363,43 @@ jobs:
 
 ### Phoenix Export
 
-Export evaluation results to Arize Phoenix for interactive analysis:
-
 ```typescript
-import { exportToPhoenix } from 'classifier-evals';
+import { exportToPhoenix } from '@reaatech/classifier-evals-exporters';
 
 await exportToPhoenix({
-  evalResults: results,
-  endpoint: 'http://localhost:6006',
-  datasetName: 'intent-classifier-v2',
-  embeddings: embeddingVectors, // Optional
-  metadata: { model: 'v2', date: new Date().toISOString() },
+  evalRun,
+  options: {
+    endpoint: 'http://localhost:6006',
+    datasetName: 'intent-classifier-v2',
+    metadata: { model: 'v2', date: new Date().toISOString() },
+  },
 });
 ```
 
 ### Langfuse Export
 
-Export to Langfuse for production observability:
-
 ```typescript
-import { exportToLangfuse } from 'classifier-evals';
+import { exportToLangfuse } from '@reaatech/classifier-evals-exporters';
 
 await exportToLangfuse({
-  evalResults: results,
-  publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-  secretKey: process.env.LANGFUSE_SECRET_KEY,
-  baseUrl: 'https://cloud.langfuse.com',
-  traceName: 'classifier-evaluation',
-  sessionId: `eval-${Date.now()}`,
+  evalRun,
+  options: {
+    publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+    secretKey: process.env.LANGFUSE_SECRET_KEY,
+    baseUrl: 'https://cloud.langfuse.com',
+    traceName: 'classifier-evaluation',
+    sessionId: `eval-${Date.now()}`,
+  },
 });
 ```
 
 ### HTML Report
 
-Generate interactive HTML reports:
-
 ```bash
-npx classifier-evals report \
+pnpm --filter @reaatech/classifier-evals-cli exec classifier-evals export \
   --results results.json \
   --format html \
-  --output reports/eval-report.html \
-  --include-confusion-matrix \
-  --include-per-class-metrics
+  --output report.html
 ```
 
 ---
@@ -373,8 +407,6 @@ npx classifier-evals report \
 ## Using with Multi-Agent Systems
 
 ### Integration with agent-mesh
-
-Register classifier-evals as an agent in agent-mesh:
 
 ```yaml
 # agents/classifier-evals.yaml
@@ -392,18 +424,6 @@ examples:
   - "Evaluate my classifier on the test set"
   - "Run LLM-as-judge on misclassifications"
   - "Check if the new model passes regression gates"
-```
-
-### Agent-to-Agent Workflow
-
-```
-User Query → agent-mesh (orchestrator)
-                  │
-                  ▼
-           classifier-evals (agent)
-                  │
-                  ▼
-           Evaluation Results → Phoenix/Langfuse
 ```
 
 ---
@@ -459,6 +479,8 @@ Every evaluation run is logged with:
 | `classifier_evals.judge.calls` | Counter | LLM judge API calls |
 | `classifier_evals.judge.cost` | Histogram | Judge cost per run |
 | `classifier_evals.gates.result` | Gauge | Gate pass/fail (1/0) |
+| `classifier_evals.metrics.accuracy` | Gauge | Overall accuracy |
+| `classifier_evals.metrics.f1_macro` | Gauge | Macro F1 score |
 
 ### Tracing
 
@@ -472,8 +494,6 @@ Each evaluation run generates OpenTelemetry spans:
 ---
 
 ## Checklist: Production Readiness
-
-Before deploying an evaluation pipeline to production:
 
 - [ ] Dataset format validated (required columns present)
 - [ ] Label distribution analyzed (no severe imbalance)
@@ -495,4 +515,3 @@ Before deploying an evaluation pipeline to production:
 - **README.md** — Quick start and overview
 - **datasets/examples/** — Example datasets and configurations
 - **MCP Specification** — https://modelcontextprotocol.io/
-- **agent-mesh/AGENTS.md** — Multi-agent orchestration patterns

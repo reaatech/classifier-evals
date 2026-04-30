@@ -2,33 +2,35 @@
 
 ## Description
 
-Export evaluation results to Langfuse for production observability. Enables tracking of evaluation metrics, traces, and scores in the Langfuse dashboard for real-time monitoring and debugging.
+Export evaluation results to Langfuse for production observability. Publishes evaluation metrics as trace events for real-time monitoring and debugging in the Langfuse dashboard.
+
+**Package:** `@reaatech/classifier-evals-exporters`
 
 ## Capabilities
 
-- **Trace export**: Export eval runs as Langfuse traces
-- **Score export**: Export quality metrics as Langfuse scores
-- **Observations**: Export individual predictions as observations
-- **Session grouping**: Group by eval run for organized tracking
-- **Metadata**: Include model version, timestamps, and custom tags
+- **Trace export**: One trace per evaluation run with structured input/output
+- **Score tracking**: Full metrics included in trace output
+- **Session grouping**: Eval runs grouped by session ID for organized dashboards
+- **HTTP auth**: Basic authentication via public/secret key pair
+- **Environment config**: Keys from `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` env vars
+- **Timeout**: 30-second AbortController per request
 
 ## Usage
 
 ### Library
 
 ```typescript
-import { LangfuseExporter } from 'classifier-evals';
+import { exportToLangfuse } from '@reaatech/classifier-evals-exporters';
 
-const exporter = new LangfuseExporter({
-  publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-  secretKey: process.env.LANGFUSE_SECRET_KEY,
-  baseUrl: 'https://cloud.langfuse.com'
-});
-
-await exporter.export({
-  evalResults: results,
-  traceName: 'classifier-evaluation',
-  sessionId: `eval-${Date.now()}`
+await exportToLangfuse({
+  evalRun,
+  options: {
+    publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+    secretKey: process.env.LANGFUSE_SECRET_KEY,
+    baseUrl: 'https://cloud.langfuse.com',
+    traceName: 'classifier-evaluation',
+    sessionId: `eval-${Date.now()}`,
+  },
 });
 ```
 
@@ -36,21 +38,18 @@ await exporter.export({
 
 ```bash
 # Export to Langfuse
-classifier-evals export --results results.json --target langfuse
-
-# With custom session
-classifier-evals export --results results.json --target langfuse --session eval-2026-04
+classifier-evals export --results results.json --langfuse
 ```
 
 ## Configuration
 
-| Option | Description |
-|--------|-------------|
-| `publicKey` | Langfuse public key (env: LANGFUSE_PUBLIC_KEY) |
-| `secretKey` | Langfuse secret key (env: LANGFUSE_SECRET_KEY) |
-| `baseUrl` | Langfuse API endpoint (default: https://cloud.langfuse.com) |
-| `traceName` | Name for the evaluation trace |
-| `sessionId` | Session identifier for grouping |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `publicKey` | Langfuse public key | `LANGFUSE_PUBLIC_KEY` env var |
+| `secretKey` | Langfuse secret key | `LANGFUSE_SECRET_KEY` env var |
+| `baseUrl` | Langfuse API endpoint | `https://cloud.langfuse.com` |
+| `traceName` | Name for the trace | `classifier-evaluation` |
+| `sessionId` | Session ID for grouping | `eval-<run_id>` |
 
 ## Environment Variables
 
@@ -62,10 +61,10 @@ classifier-evals export --results results.json --target langfuse --session eval-
 
 ## Exported Data
 
-- **Traces**: One trace per evaluation run
-- **Scores**: Accuracy, F1, precision, recall, etc.
-- **Observations**: Individual prediction results with metadata
-- **Sessions**: Grouped by evaluation run ID
+Each eval run creates one trace event with:
+- **Input**: `dataset_path`, `total_samples`
+- **Output**: Full `metrics` object, `all_gates_passed`
+- **Metadata**: `duration_ms`, `run_id`, confusion matrix label count
 
 ## Related Skills
 

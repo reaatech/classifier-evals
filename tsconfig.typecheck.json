@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@reaatech/classifier-evals": ["./packages/classifier-evals/src/index.ts"],
+      "@reaatech/classifier-evals-dataset": ["./packages/dataset/src/index.ts"],
+      "@reaatech/classifier-evals-metrics": ["./packages/metrics/src/index.ts"],
+      "@reaatech/classifier-evals-judge": ["./packages/judge/src/index.ts"],
+      "@reaatech/classifier-evals-gates": ["./packages/gates/src/index.ts"],
+      "@reaatech/classifier-evals-exporters": ["./packages/exporters/src/index.ts"],
+      "@reaatech/classifier-evals-mcp-server": ["./packages/mcp-server/src/index.ts"],
+      "@reaatech/classifier-evals-cli": ["./packages/cli/src/index.ts"]
+    }
+  }
+}
+
