@@ -161,6 +161,9 @@ importers:
         specifier: ^6.35.0
         version: 6.35.0(zod@4.4.1)
     devDependencies:
+      '@reaatech/classifier-evals-metrics':
+        specifier: workspace:*
+        version: link:../metrics
       tsup:
         specifier: ^8.4.0
         version: 8.5.1(postcss@8.5.13)(typescript@5.9.3)(yaml@2.8.3)

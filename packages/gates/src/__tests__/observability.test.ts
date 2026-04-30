@@ -5,9 +5,9 @@ import {
   generatePRComment,
   isGitHubActions,
   setGitHubOutput,
-} from '@reaatech/classifier-evals-gates';
+} from '../ci-integration.js';
 import { describe, expect, it, vi } from 'vitest';
-import type { GateResult } from '../domain.js';
+import type { GateResult } from '@reaatech/classifier-evals';
 import {
   getEvalRunId,
   logDatasetLoad,
@@ -18,7 +18,7 @@ import {
   logJudgeCost,
   logWarn,
   setEvalRunId,
-} from '../logger.js';
+} from '@reaatech/classifier-evals';
 import {
   getMeter,
   initMetrics,
@@ -30,7 +30,7 @@ import {
   recordJudgeCost,
   recordSamplesEvaluated,
   shutdownMetrics,
-} from '../telemetry.js';
+} from '@reaatech/classifier-evals';
 import {
   endSpan,
   startDatasetLoadSpan,
@@ -39,7 +39,7 @@ import {
   startJudgeSpan,
   startMetricsSpan,
   withSpan,
-} from '../tracing.js';
+} from '@reaatech/classifier-evals';
 
 describe('observability and CI helpers', () => {
   it('records logs, spans, and metrics without throwing', async () => {
@@ -148,7 +148,7 @@ describe('observability and CI helpers', () => {
   });
 
   it('log functions handle errors gracefully', async () => {
-    const loggerModule = await import('../logger.js');
+    const loggerModule = await import('@reaatech/classifier-evals');
     const originalLogger = loggerModule.logger;
     const origInfo = originalLogger.info;
     const origWarn = originalLogger.warn;
