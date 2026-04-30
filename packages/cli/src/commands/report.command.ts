@@ -2,13 +2,13 @@
  * Report command - generate reports from evaluation results
  */
 
-import { Command } from 'commander';
+import * as fs from 'node:fs';
+import type { EvalRun } from '@reaatech/classifier-evals';
 import { exportToJson } from '@reaatech/classifier-evals-exporters';
 import { exportToHtml } from '@reaatech/classifier-evals-exporters';
 import { exportToLangfuse } from '@reaatech/classifier-evals-exporters';
 import { exportToPhoenix } from '@reaatech/classifier-evals-exporters';
-import * as fs from 'fs';
-import type { EvalRun } from '@reaatech/classifier-evals';
+import type { Command } from 'commander';
 
 interface ReportCommandOptions {
   results: string;
@@ -91,7 +91,7 @@ export function reportCommand(program: Command): void {
           fs.writeFileSync(options.output, output);
           console.error(`\nReport generated: ${options.output}`);
         } else {
-          process.stdout.write(output + '\n');
+          process.stdout.write(`${output}\n`);
         }
 
         process.exit(0);

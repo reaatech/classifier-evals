@@ -1,25 +1,21 @@
-import { describe, expect, it, vi } from 'vitest';
+import { calculateMetricsFromCM } from '@reaatech/classifier-evals-metrics';
+import { buildConfusionMatrix } from '@reaatech/classifier-evals-metrics';
 import {
-  createCostTracker,
-} from '../cost-tracker.js';
+  generateHeatmapData,
+  generateMetricsBarChart,
+  generatePRCurveData,
+} from '@reaatech/classifier-evals-metrics';
+import { describe, expect, it, vi } from 'vitest';
+import { executeConsensusVoting } from '../consensus-voting.js';
+import { createCostTracker } from '../cost-tracker.js';
+import { createJudgeEngine } from '../judge-engine.js';
+import { formatPrompt, getPromptTemplate, registerCustomTemplate } from '../prompt-templates.js';
 import {
   aggregateConsensusResults,
   aggregateJudgeResults,
   exportJudgeResults,
   generateJudgeSummaryReport,
 } from '../result-aggregator.js';
-import {
-  createJudgeEngine,
-} from '../judge-engine.js';
-import {
-  registerCustomTemplate,
-  getPromptTemplate,
-  formatPrompt,
-} from '../prompt-templates.js';
-import { executeConsensusVoting } from '../consensus-voting.js';
-import { calculateMetricsFromCM } from '@reaatech/classifier-evals-metrics';
-import { buildConfusionMatrix } from '@reaatech/classifier-evals-metrics';
-import { generateHeatmapData, generateMetricsBarChart, generatePRCurveData } from '@reaatech/classifier-evals-metrics';
 
 const sample = {
   text: 'Reset password',
@@ -254,8 +250,8 @@ describe('judge engine and helpers', () => {
     };
     const result = generateHeatmapData(cm, 'column');
     expect(result.normalized).toBe(true);
-    expect(result.values[0]![0]).toBeCloseTo(0.4);
-    expect(result.values[1]![1]).toBeCloseTo(0.8);
+    expect(result.values[0]?.[0]).toBeCloseTo(0.4);
+    expect(result.values[1]?.[1]).toBeCloseTo(0.8);
   });
 
   it('heatmap with no normalization returns raw values', () => {
@@ -292,7 +288,7 @@ describe('judge engine and helpers', () => {
     };
     const result = generateHeatmapData(cm, false);
     expect(result.normalized).toBe(false);
-    expect(result.values[0]![0]).toBe(2);
+    expect(result.values[0]?.[0]).toBe(2);
   });
 
   it('PR curve produces thresholds with mixed positive/negative samples', () => {

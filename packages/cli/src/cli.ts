@@ -3,15 +3,15 @@
  * CLI entry point for classifier-evals
  */
 
+import { createRequire } from 'node:module';
 import { Command } from 'commander';
-import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const pkg = require('../../package.json');
-import { evalCommand } from './commands/eval.command.js';
 import { compareCommand } from './commands/compare.command.js';
+import { evalCommand } from './commands/eval.command.js';
+import { exportCommand } from './commands/export.command.js';
 import { gatesCommand } from './commands/gates.command.js';
 import { judgeCommand } from './commands/judge.command.js';
-import { exportCommand } from './commands/export.command.js';
 
 process.on('unhandledRejection', (reason) => {
   console.error('Fatal error:', reason instanceof Error ? reason.message : reason);

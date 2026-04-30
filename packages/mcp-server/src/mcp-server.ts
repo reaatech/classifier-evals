@@ -10,11 +10,11 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { logger } from '@reaatech/classifier-evals';
-import { runEvalTool } from './tools/run-eval.tool.js';
 import { checkGatesTool } from './tools/check-gates.tool.js';
 import { compareModelsTool } from './tools/compare-models.tool.js';
-import { llmJudgeTool } from './tools/llm-judge.tool.js';
 import { generateReportTool } from './tools/generate-report.tool.js';
+import { llmJudgeTool } from './tools/llm-judge.tool.js';
+import { runEvalTool } from './tools/run-eval.tool.js';
 
 const server = new Server(
   {

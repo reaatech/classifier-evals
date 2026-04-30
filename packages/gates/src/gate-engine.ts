@@ -2,11 +2,11 @@
  * Regression Gate Engine - evaluates quality gates for CI
  */
 
-import { ClassificationMetrics, RegressionGate, GateResult } from '@reaatech/classifier-evals';
-import { evaluateThresholdGate } from './threshold-gates.js';
+import type { ClassificationMetrics, GateResult, RegressionGate } from '@reaatech/classifier-evals';
 import { evaluateBaselineComparison } from './baseline-comparison.js';
 import { evaluateDistributionGate } from './distribution-gates.js';
 import type { GateEvaluationContext } from './metric-lookup.js';
+import { evaluateThresholdGate } from './threshold-gates.js';
 
 /**
  * Gate type discriminator
@@ -203,11 +203,11 @@ export class GateEngine {
         const msg = this.escapeXml(gateResult.message ?? 'Gate failed');
         xml += `      <failure message="${msg}"/>\n`;
       }
-      xml += `    </testcase>\n`;
+      xml += '    </testcase>\n';
     }
 
-    xml += `  </testsuite>\n`;
-    xml += `</testsuites>\n`;
+    xml += '  </testsuite>\n';
+    xml += '</testsuites>\n';
 
     return xml;
   }

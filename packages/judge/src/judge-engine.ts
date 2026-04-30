@@ -3,10 +3,10 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import type { ClassificationResult, JudgedResult } from '@reaatech/classifier-evals';
 import OpenAI from 'openai';
-import { ClassificationResult, JudgedResult } from '@reaatech/classifier-evals';
-import { getPromptTemplate, formatPrompt, PromptTemplateType } from './prompt-templates.js';
-import { CostTracker, createCostTracker, BudgetConfig } from './cost-tracker.js';
+import { type BudgetConfig, type CostTracker, createCostTracker } from './cost-tracker.js';
+import { type PromptTemplateType, formatPrompt, getPromptTemplate } from './prompt-templates.js';
 
 /**
  * Result from LLM judge evaluation
@@ -136,7 +136,7 @@ export class JudgeEngine {
     }
 
     let result: JudgedResult;
-    let tokensUsed;
+    let tokensUsed: { input: number; output: number };
 
     if (this.config.customJudge) {
       result = await this.config.customJudge(prompt);
@@ -267,12 +267,12 @@ export class JudgeEngine {
           break;
         }
         const jitter = Math.random() * 500;
-        const delay = Math.min(1000 * Math.pow(2, attempt) + jitter, 10000);
+        const delay = Math.min(1000 * 2 ** attempt + jitter, 10000);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
-    console.error(`WARNING: All LLM retries failed, falling back to heuristic judge for sample`);
+    console.error('WARNING: All LLM retries failed, falling back to heuristic judge for sample');
     return this.heuristicJudge(prompt, sample);
   }
 

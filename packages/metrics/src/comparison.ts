@@ -3,7 +3,7 @@
  * Statistical significance testing, effect size calculation
  */
 
-import { ClassificationResult, EvalRun, ModelComparison } from '@reaatech/classifier-evals';
+import type { ClassificationResult, EvalRun, ModelComparison } from '@reaatech/classifier-evals';
 import { calculateAccuracy } from './classification-metrics.js';
 import { buildConfusionMatrix } from './confusion-matrix.js';
 
@@ -89,7 +89,7 @@ export function pairedComparison(
   let neitherCorrect = 0;
 
   for (let i = 0; i < samples.length; i++) {
-    const trueLabel = samples[i]!.label;
+    const trueLabel = samples[i]?.label;
     const baselineCorrect = baselinePredictions[i]! === trueLabel;
     const candidateCorrect = candidatePredictions[i]! === trueLabel;
 
@@ -251,7 +251,7 @@ export function calculateEffectSize(
 export function compareModels(
   baselineResults: ClassificationResult[],
   candidateResults: ClassificationResult[],
-  alpha: number = 0.05,
+  alpha = 0.05,
 ): ModelComparison {
   const baselineAccuracy = calculateAccuracy(baselineResults);
   const candidateAccuracy = calculateAccuracy(candidateResults);
@@ -306,7 +306,7 @@ export function compareModels(
 export function comparePersistedEvalRuns(
   baselineRun: EvalRun,
   candidateRun: EvalRun,
-  alpha: number = 0.05,
+  alpha = 0.05,
 ): ModelComparison {
   const baselineCM = baselineRun.confusion_matrix;
   const candidateCM = candidateRun.confusion_matrix;

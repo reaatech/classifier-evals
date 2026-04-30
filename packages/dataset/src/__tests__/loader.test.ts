@@ -2,7 +2,7 @@
  * Unit tests for dataset loader
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { loadDatasetFromContent } from '../loader.js';
 import { validateDataset } from '../validator.js';
 

@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import type { EvalRun } from './domain.js';
 
 export function loadEvalRunFromFile(filePath: string): EvalRun {
@@ -10,4 +10,3 @@ export function loadEvalRunFromFile(filePath: string): EvalRun {
     });
   }
 }
-

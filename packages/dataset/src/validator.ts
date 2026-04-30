@@ -3,7 +3,7 @@
  * Validates schema, label distribution, duplicates, and data quality
  */
 
-import {
+import type {
   ClassificationResult,
   EvalDataset,
   ValidationError,
@@ -78,7 +78,7 @@ function detectDuplicates(samples: ClassificationResult[]): ValidationWarning[] 
   const seenTexts = new Map<string, number[]>();
 
   for (let i = 0; i < samples.length; i++) {
-    const text = samples[i]!.text.trim().toLowerCase();
+    const text = samples[i]?.text.trim().toLowerCase();
     const existing = seenTexts.get(text);
     if (existing) {
       existing.push(i);
@@ -125,7 +125,7 @@ function analyzeLabelDistribution(samples: ClassificationResult[]): ValidationWa
 
   // Check for severe class imbalance
   const maxCount = counts.reduce((a, b) => Math.max(a, b), 0);
-  const minCount = counts.reduce((a, b) => Math.min(a, b), Infinity);
+  const minCount = counts.reduce((a, b) => Math.min(a, b), Number.POSITIVE_INFINITY);
   const imbalanceRatio = maxCount / minCount;
 
   if (imbalanceRatio > 10) {

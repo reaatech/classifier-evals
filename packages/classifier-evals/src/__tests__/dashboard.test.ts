@@ -2,20 +2,20 @@
  * Unit tests for dashboard metrics
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  evalRunToTrendDataPoint,
+  type TrendDataPoint,
   calculateTrendStatistics,
-  generateDashboardSummary,
+  compareEvalRuns,
+  evalRunToTrendDataPoint,
+  exportDashboardData,
+  filterByDataset,
   filterByDateRange,
   filterByModel,
-  filterByDataset,
-  compareEvalRuns,
   generateDashboardReport,
-  exportDashboardData,
-  type TrendDataPoint,
+  generateDashboardSummary,
 } from '../dashboard.js';
-import { EvalRun } from '../domain.js';
+import type { EvalRun } from '../domain.js';
 
 function createMockEvalRun(overrides: Partial<EvalRun> = {}): EvalRun {
   const now = new Date().toISOString();

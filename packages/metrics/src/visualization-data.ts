@@ -1,7 +1,7 @@
 /**
  * Visualization data generation for confusion matrices and metrics
  */
-import { ConfusionMatrix, ClassificationResult } from '@reaatech/classifier-evals';
+import type { ClassificationResult, ConfusionMatrix } from '@reaatech/classifier-evals';
 
 export interface HeatmapData {
   labels: string[];

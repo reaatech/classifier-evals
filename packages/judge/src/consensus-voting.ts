@@ -3,7 +3,7 @@
  * Implements majority voting, weighted voting, and disagreement detection
  */
 
-import { ClassificationResult, JudgedResult } from '@reaatech/classifier-evals';
+import type { ClassificationResult, JudgedResult } from '@reaatech/classifier-evals';
 
 /**
  * A single judge's evaluation result
@@ -276,8 +276,8 @@ export function analyzeDisagreements(consensusResults: ConsensusResult[]): {
  */
 export function optimizeJudgeCount(
   historicalResults: ConsensusResult[],
-  targetAgreementRate: number = 0.8,
-  maxJudges: number = 10,
+  targetAgreementRate = 0.8,
+  maxJudges = 10,
 ): { optimalJudges: number; estimatedAccuracy: number; estimatedCost: number } {
   // Analyze how agreement rate changes with judge count
   const agreementByCount = new Map<number, number[]>();
@@ -287,7 +287,7 @@ export function optimizeJudgeCount(
     if (!agreementByCount.has(count)) {
       agreementByCount.set(count, []);
     }
-    agreementByCount.get(count)!.push(result.agreementRate);
+    agreementByCount.get(count)?.push(result.agreementRate);
   }
 
   // Find minimum judges that achieve target agreement rate

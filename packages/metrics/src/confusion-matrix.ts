@@ -2,7 +2,7 @@
  * Confusion matrix calculation for multi-class classification
  */
 
-import { ClassificationResult, ConfusionMatrix } from '@reaatech/classifier-evals';
+import type { ClassificationResult, ConfusionMatrix } from '@reaatech/classifier-evals';
 
 /**
  * Build a confusion matrix from classification results
@@ -41,15 +41,15 @@ export function buildConfusionMatrix(samples: ClassificationResult[]): Confusion
 
   // Calculate per-class metrics
   const perClass = labels.map((label, i) => {
-    const tp = matrix[i]![i]!; // True positives
-    const fn = matrix[i]!.reduce((sum, val, j) => sum + (j !== i ? val : 0), 0); // False negatives (row minus diagonal)
+    const tp = matrix[i]?.[i]!; // True positives
+    const fn = matrix[i]?.reduce((sum, val, j) => sum + (j !== i ? val : 0), 0); // False negatives (row minus diagonal)
     const fp = matrix.reduce((sum, row, j) => sum + (j !== i ? row[i]! : 0), 0); // False positives (column minus diagonal)
     const tn = samples.length - tp - fp - fn; // True negatives
 
     const precision = tp + fp > 0 ? tp / (tp + fp) : 0;
     const recall = tp + fn > 0 ? tp / (tp + fn) : 0;
     const f1 = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0;
-    const support = matrix[i]!.reduce((sum, val) => sum + val, 0);
+    const support = matrix[i]?.reduce((sum, val) => sum + val, 0);
 
     // accuracy calculated but not used in return object
     return {
@@ -161,21 +161,21 @@ export function formatConfusionMatrix(cm: ConfusionMatrix): string {
   let result = '';
 
   // Header
-  result += ' '.repeat(labelWidth + 1) + 'Predicted\n';
+  result += `${' '.repeat(labelWidth + 1)}Predicted\n`;
   result += ' '.repeat(labelWidth + 1);
   for (let j = 0; j < numLabels; j++) {
-    result += labels[j]!.substring(0, cellWidth - 1).padStart(cellWidth);
+    result += labels[j]?.substring(0, cellWidth - 1).padStart(cellWidth);
   }
   result += '\n';
 
   // Separator
-  result += ' '.repeat(labelWidth + 1) + '-'.repeat(numLabels * cellWidth) + '\n';
+  result += `${' '.repeat(labelWidth + 1) + '-'.repeat(numLabels * cellWidth)}\n`;
 
   // Rows
   for (let i = 0; i < numLabels; i++) {
-    result += labels[i]!.substring(0, labelWidth).padEnd(labelWidth) + ' |';
+    result += `${labels[i]?.substring(0, labelWidth).padEnd(labelWidth)} |`;
     for (let j = 0; j < numLabels; j++) {
-      result += matrix[i]![j]!.toString().padStart(cellWidth);
+      result += matrix[i]?.[j]?.toString().padStart(cellWidth);
     }
     result += '\n';
   }
@@ -191,8 +191,8 @@ export function getErrorRates(cm: ConfusionMatrix): Record<string, number> {
 
   for (let i = 0; i < cm.labels.length; i++) {
     const label = cm.labels[i]!;
-    const total = cm.matrix[i]!.reduce((sum, v) => sum + v, 0);
-    const errors = total - cm.matrix[i]![i]!;
+    const total = cm.matrix[i]?.reduce((sum, v) => sum + v, 0);
+    const errors = total - cm.matrix[i]?.[i]!;
     errorRates[label] = total > 0 ? errors / total : 0;
   }
 
@@ -204,18 +204,18 @@ export function getErrorRates(cm: ConfusionMatrix): Record<string, number> {
  */
 export function getTopMisclassifications(
   cm: ConfusionMatrix,
-  topN: number = 10,
+  topN = 10,
 ): Array<{ trueLabel: string; predictedLabel: string; count: number }> {
   const misclassifications: Array<{ trueLabel: string; predictedLabel: string; count: number }> =
     [];
 
   for (let i = 0; i < cm.labels.length; i++) {
     for (let j = 0; j < cm.labels.length; j++) {
-      if (i !== j && cm.matrix[i]![j]! > 0) {
+      if (i !== j && cm.matrix[i]?.[j]! > 0) {
         misclassifications.push({
           trueLabel: cm.labels[i]!,
           predictedLabel: cm.labels[j]!,
-          count: cm.matrix[i]![j]!,
+          count: cm.matrix[i]?.[j]!,
         });
       }
     }

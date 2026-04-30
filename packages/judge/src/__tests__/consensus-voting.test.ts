@@ -2,18 +2,18 @@
  * Unit tests for consensus voting
  */
 
-import { describe, it, expect } from 'vitest';
+import type { ClassificationResult } from '@reaatech/classifier-evals';
+import { describe, expect, it } from 'vitest';
 import {
-  executeConsensusVoting,
-  executeBatchConsensusVoting,
-  analyzeDisagreements,
-  optimizeJudgeCount,
-  type JudgeVote,
   type ConsensusConfig,
+  type JudgeVote,
+  analyzeDisagreements,
+  executeBatchConsensusVoting,
+  executeConsensusVoting,
+  optimizeJudgeCount,
 } from '../consensus-voting.js';
-import { ClassificationResult } from '@reaatech/classifier-evals';
 
-function createSample(text: string = 'test'): ClassificationResult {
+function createSample(text = 'test'): ClassificationResult {
   return {
     text,
     label: 'positive',
@@ -25,9 +25,9 @@ function createSample(text: string = 'test'): ClassificationResult {
 function createVote(
   judgeId: string,
   isCorrect: boolean,
-  confidence: number = 0.9,
-  cost: number = 0.01,
-  model: string = 'gpt-4',
+  confidence = 0.9,
+  cost = 0.01,
+  model = 'gpt-4',
 ): JudgeVote {
   return {
     judgeId,

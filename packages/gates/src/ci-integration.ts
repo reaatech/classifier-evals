@@ -1,8 +1,8 @@
 /**
  * CI integration utilities for regression gates
  */
-import { appendFileSync } from 'fs';
-import { GateResult, EvalRun } from '@reaatech/classifier-evals';
+import { appendFileSync } from 'node:fs';
+import type { EvalRun, GateResult } from '@reaatech/classifier-evals';
 
 export interface CIOutput {
   exitCode: number;
@@ -39,7 +39,7 @@ export function generateGitHubOutput(results: GateResult[]): CIOutput {
 
   const summaryLines = results.map((r) => {
     const status = r.passed ? '✅' : '❌';
-    return `${status} ${r.gate.name}: ${r.passed ? 'PASSED' : 'FAILED'}${r.message !== undefined ? ' - ' + r.message : ''}`;
+    return `${status} ${r.gate.name}: ${r.passed ? 'PASSED' : 'FAILED'}${r.message !== undefined ? ` - ${r.message}` : ''}`;
   });
 
   const details = results

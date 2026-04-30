@@ -3,7 +3,7 @@
  * Used for PII protection and deterministic identifiers
  */
 
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 
 /**
  * Creates a SHA-256 hash of the input string
