@@ -6,7 +6,7 @@
 import { createRequire } from 'node:module';
 import { Command } from 'commander';
 const require = createRequire(import.meta.url);
-const pkg = require('../../package.json');
+const pkg = require('../../../package.json');
 import { compareCommand } from './commands/compare.command.js';
 import { evalCommand } from './commands/eval.command.js';
 import { exportCommand } from './commands/export.command.js';
