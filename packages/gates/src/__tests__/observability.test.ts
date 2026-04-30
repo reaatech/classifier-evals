@@ -1,12 +1,4 @@
 import * as fs from 'node:fs';
-import {
-  generateGitHubOutput,
-  generateJUnitXML,
-  generatePRComment,
-  isGitHubActions,
-  setGitHubOutput,
-} from '../ci-integration.js';
-import { describe, expect, it, vi } from 'vitest';
 import type { GateResult } from '@reaatech/classifier-evals';
 import {
   getEvalRunId,
@@ -40,6 +32,14 @@ import {
   startMetricsSpan,
   withSpan,
 } from '@reaatech/classifier-evals';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  generateGitHubOutput,
+  generateJUnitXML,
+  generatePRComment,
+  isGitHubActions,
+  setGitHubOutput,
+} from '../ci-integration.js';
 
 describe('observability and CI helpers', () => {
   it('records logs, spans, and metrics without throwing', async () => {

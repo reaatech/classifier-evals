@@ -1,12 +1,9 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {
-  loadRegressionGatesFromFile,
-  normalizeRegressionGate,
-} from '../gate-utils.js';
 import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
 import { describe, expect, it } from 'vitest';
+import { loadRegressionGatesFromFile, normalizeRegressionGate } from '../gate-utils.js';
 
 describe('eval run and gate helpers', () => {
   it('builds eval runs and normalizes regression gates', () => {
@@ -156,4 +153,3 @@ describe('eval run and gate helpers', () => {
     expect(evalRun.dataset_name).toBeUndefined();
   });
 });
-

@@ -7,4 +7,3 @@ describe('mcp-server', () => {
     expect(mod.startMCPServer).toBeDefined();
   });
 });
-
