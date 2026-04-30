@@ -50,7 +50,7 @@ async function sendToPhoenix(
   };
 
   if (apiKey !== undefined && apiKey !== '') {
-    headers['Authorization'] = `Bearer ${apiKey}`;
+    headers.Authorization = `Bearer ${apiKey}`;
   }
 
   const controller = new AbortController();

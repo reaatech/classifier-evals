@@ -2,14 +2,14 @@
  * Baseline comparison gates
  */
 
-import { readFileSync } from 'fs';
-import { ClassificationMetrics, RegressionGate, GateResult } from '@reaatech/classifier-evals';
+import { readFileSync } from 'node:fs';
+import type { ClassificationMetrics, GateResult, RegressionGate } from '@reaatech/classifier-evals';
 import type { EvalRun } from '@reaatech/classifier-evals';
 import {
+  type GateEvaluationContext,
   compareThreshold,
   formatMetricValue,
   getMetricValue,
-  type GateEvaluationContext,
 } from './metric-lookup.js';
 
 function loadBaselineEvalRun(baselinePath: string): EvalRun {

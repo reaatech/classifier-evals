@@ -2,10 +2,10 @@
  * Compare command - compare two model evaluations
  */
 
-import { Command } from 'commander';
-import { writeFileSync } from 'fs';
-import { comparePersistedEvalRuns, summarizeComparison } from '@reaatech/classifier-evals-metrics';
+import { writeFileSync } from 'node:fs';
 import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
+import { comparePersistedEvalRuns, summarizeComparison } from '@reaatech/classifier-evals-metrics';
+import type { Command } from 'commander';
 
 interface CompareCommandOptions {
   baseline: string;
@@ -41,7 +41,7 @@ export function compareCommand(program: Command): void {
           writeFileSync(options.output, JSON.stringify({ comparison, summary }, null, 2));
           console.error(`\nComparison written to: ${options.output}`);
         } else {
-          process.stdout.write(JSON.stringify({ comparison, summary }, null, 2) + '\n');
+          process.stdout.write(`${JSON.stringify({ comparison, summary }, null, 2)}\n`);
         }
 
         process.exit(0);

@@ -3,7 +3,11 @@
  * Accuracy, precision, recall, F1 (macro/micro/weighted), MCC, Cohen's kappa
  */
 
-import { ClassificationResult, ClassificationMetrics, ConfusionMatrix } from '@reaatech/classifier-evals';
+import type {
+  ClassificationMetrics,
+  ClassificationResult,
+  ConfusionMatrix,
+} from '@reaatech/classifier-evals';
 import { buildConfusionMatrix, getTotalCorrect, getTotalSamples } from './confusion-matrix.js';
 
 /**
@@ -176,7 +180,7 @@ export function calculateMCC(samples: ClassificationResult[]): number {
 
   // Row sums (true counts) and column sums (predicted counts)
   const t: number[] = matrix.map((row) => row.reduce((a, b) => a + b, 0));
-  const p: number[] = matrix[0]!.map((_, j) => matrix.reduce((sum, row) => sum + row[j]!, 0));
+  const p: number[] = matrix[0]?.map((_, j) => matrix.reduce((sum, row) => sum + row[j]!, 0));
 
   const sumPKTK = p.reduce((sum, pk, i) => sum + pk * t[i]!, 0);
   const numerator = c * s - sumPKTK;
@@ -215,7 +219,7 @@ export function calculateCohensKappa(samples: ClassificationResult[]): number {
   // Expected agreement by chance
   let pe = 0;
   for (let i = 0; i < labels.length; i++) {
-    const trueCount = matrix[i]!.reduce((sum, v) => sum + v, 0);
+    const trueCount = matrix[i]?.reduce((sum, v) => sum + v, 0);
     const predCount = matrix.reduce((sum, row) => sum + row[i]!, 0);
     pe += (trueCount / n) * (predCount / n);
   }
@@ -275,7 +279,7 @@ function calculateMCCFromMatrix(cm: ConfusionMatrix): number {
   const c = matrix.reduce((sum, row, i) => sum + row[i]!, 0);
   const s = total;
   const t: number[] = matrix.map((row) => row.reduce((a, b) => a + b, 0));
-  const p: number[] = matrix[0]!.map((_, j) => matrix.reduce((sum, row) => sum + row[j]!, 0));
+  const p: number[] = matrix[0]?.map((_, j) => matrix.reduce((sum, row) => sum + row[j]!, 0));
 
   const sumPKTK = p.reduce((sum, pk, i) => sum + pk * t[i]!, 0);
   const numerator = c * s - sumPKTK;
@@ -303,7 +307,7 @@ function calculateKappaFromMatrix(cm: ConfusionMatrix): number {
   const po = matrix.reduce((sum, row, i) => sum + row[i]!, 0) / n;
   let pe = 0;
   for (let i = 0; i < cm.labels.length; i++) {
-    const trueCount = matrix[i]!.reduce((sum, v) => sum + v, 0);
+    const trueCount = matrix[i]?.reduce((sum, v) => sum + v, 0);
     const predCount = matrix.reduce((sum, row) => sum + row[i]!, 0);
     pe += (trueCount / n) * (predCount / n);
   }

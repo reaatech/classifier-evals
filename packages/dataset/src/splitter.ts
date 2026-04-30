@@ -3,7 +3,7 @@
  * Supports train/test split with stratification and K-fold cross-validation
  */
 
-import { ClassificationResult, EvalDataset } from '@reaatech/classifier-evals';
+import type { ClassificationResult, EvalDataset } from '@reaatech/classifier-evals';
 
 /**
  * Options for dataset splitting
@@ -33,7 +33,7 @@ export interface SplitResult {
  * Seeded random number generator (Mulberry32)
  */
 function createRng(seed: number): () => number {
-  return function () {
+  return () => {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
@@ -193,7 +193,7 @@ export function splitDataset(
  * @param seed - Random seed for reproducibility
  * @returns Array of k folds
  */
-export function kFoldSplit(dataset: EvalDataset, k: number = 5, seed: number = 42): EvalDataset[] {
+export function kFoldSplit(dataset: EvalDataset, k = 5, seed = 42): EvalDataset[] {
   if (k < 2) {
     throw new Error('k must be at least 2');
   }
@@ -210,7 +210,7 @@ export function kFoldSplit(dataset: EvalDataset, k: number = 5, seed: number = 4
   const folds: ClassificationResult[][] = Array.from({ length: k }, () => []);
 
   for (let i = 0; i < shuffled.length; i++) {
-    folds[i % k]!.push(shuffled[i]!);
+    folds[i % k]?.push(shuffled[i]!);
   }
 
   // Convert each fold to an EvalDataset
@@ -247,8 +247,8 @@ export function kFoldSplit(dataset: EvalDataset, k: number = 5, seed: number = 4
  */
 export function kFoldSplits(
   dataset: EvalDataset,
-  k: number = 5,
-  seed: number = 42,
+  k = 5,
+  seed = 42,
 ): { train: EvalDataset; test: EvalDataset }[] {
   const folds = kFoldSplit(dataset, k, seed);
   const splits: { train: EvalDataset; test: EvalDataset }[] = [];

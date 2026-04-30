@@ -2,14 +2,14 @@
  * Judge command - run LLM-as-judge on samples
  */
 
-import { Command } from 'commander';
-import { writeFileSync } from 'fs';
+import { writeFileSync } from 'node:fs';
+import type { ClassificationResult } from '@reaatech/classifier-evals';
+import { loadDataset } from '@reaatech/classifier-evals-dataset';
 import { createJudgeEngine } from '@reaatech/classifier-evals-judge';
 import { executeBatchConsensusVoting } from '@reaatech/classifier-evals-judge';
-import { loadDataset } from '@reaatech/classifier-evals-dataset';
-import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
 import type { JudgeAggregateResult, JudgeEngine } from '@reaatech/classifier-evals-judge';
-import type { ClassificationResult } from '@reaatech/classifier-evals';
+import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
+import type { Command } from 'commander';
 
 interface JudgeCommandOptions {
   samples: string;
@@ -50,9 +50,9 @@ export function judgeCommand(program: Command): void {
       process.on('SIGTERM', cleanup);
 
       try {
-        const budget = parseFloat(options.budget);
-        const concurrency = parseInt(options.concurrency, 10);
-        const consensusCount = parseInt(options.consensusCount, 10);
+        const budget = Number.parseFloat(options.budget);
+        const concurrency = Number.parseInt(options.concurrency, 10);
+        const consensusCount = Number.parseInt(options.consensusCount, 10);
 
         if (Number.isNaN(budget) || budget <= 0) {
           throw new Error(`Invalid budget: "${options.budget}". Must be a positive number.`);
@@ -121,7 +121,7 @@ export function judgeCommand(program: Command): void {
           writeFileSync(options.output, output);
           console.error(`\nResults written to: ${options.output}`);
         } else {
-          process.stdout.write(output + '\n');
+          process.stdout.write(`${output}\n`);
         }
 
         process.exit(0);

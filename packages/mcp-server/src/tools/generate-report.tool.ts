@@ -1,10 +1,10 @@
 /**
  * generate_report MCP tool implementation
  */
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
 import { exportToHtml } from '@reaatech/classifier-evals-exporters';
 import { exportToJson } from '@reaatech/classifier-evals-exporters';
-import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
 
 export async function generateReportTool(args: Record<string, unknown>): Promise<CallToolResult> {
   const format = (args.format as string | undefined) ?? 'html';

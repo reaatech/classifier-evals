@@ -2,11 +2,11 @@
  * Eval command - run evaluation on a dataset
  */
 
-import { Command } from 'commander';
+import * as fs from 'node:fs';
 import { loadDataset } from '@reaatech/classifier-evals-dataset';
-import { exportToJson, exportToHtml } from '@reaatech/classifier-evals-exporters';
+import { exportToHtml, exportToJson } from '@reaatech/classifier-evals-exporters';
 import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
-import * as fs from 'fs';
+import type { Command } from 'commander';
 
 interface EvalCommandOptions {
   dataset: string;
@@ -49,7 +49,7 @@ export function evalCommand(program: Command): void {
         console.error(`\nConfusion Matrix (${cm.labels.length}x${cm.labels.length}):`);
         console.error(cm.matrix.map((row) => row.join('\t')).join('\n'));
 
-        console.error(`\nOverall Metrics:`);
+        console.error('\nOverall Metrics:');
         console.error(`  Accuracy: ${(metrics.accuracy * 100).toFixed(2)}%`);
         console.error(`  Macro F1: ${(metrics.f1_macro * 100).toFixed(2)}%`);
         console.error(`  Precision (Macro): ${(metrics.precision_macro * 100).toFixed(2)}%`);
@@ -78,7 +78,7 @@ export function evalCommand(program: Command): void {
           fs.writeFileSync(options.output, output);
           console.error(`\nResults written to: ${options.output}`);
         } else {
-          process.stdout.write(output + '\n');
+          process.stdout.write(`${output}\n`);
         }
 
         process.exit(0);

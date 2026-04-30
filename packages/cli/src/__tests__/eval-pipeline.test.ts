@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { loadDataset } from '@reaatech/classifier-evals-dataset';
 import { buildConfusionMatrix, calculateAllMetrics } from '@reaatech/classifier-evals-metrics';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 describe('End-to-end evaluation pipeline', () => {
   let tempDir: string;

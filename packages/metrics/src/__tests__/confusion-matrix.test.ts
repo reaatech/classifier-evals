@@ -2,7 +2,8 @@
  * Unit tests for confusion matrix calculation
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { calculateAllMetrics } from '../classification-metrics.js';
 import {
   buildConfusionMatrix,
   formatConfusionMatrix,
@@ -13,7 +14,6 @@ import {
   getTotalSamples,
   normalizeConfusionMatrix,
 } from '../confusion-matrix.js';
-import { calculateAllMetrics } from '../classification-metrics.js';
 
 describe('Confusion Matrix', () => {
   const samples = [
@@ -135,7 +135,7 @@ describe('Classification Metrics', () => {
     const normalizedPred = normalizeConfusionMatrix(cm, 'pred');
 
     // Verify column-wise normalization
-    const colSums = cm.matrix[0]!.map((_, j) => cm.matrix.reduce((sum, row) => sum + row[j]!, 0));
+    const colSums = cm.matrix[0]?.map((_, j) => cm.matrix.reduce((sum, row) => sum + row[j]!, 0));
 
     for (let j = 0; j < cm.labels.length; j++) {
       if (colSums[j]! > 0) {

@@ -3,13 +3,13 @@
  * Supports CSV, JSON, JSONL, and auto-detection of format
  */
 
-import { readFile } from 'fs/promises';
-import path from 'path';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import {
-  ClassificationResult,
+  type ClassificationResult,
   ClassificationResultSchema,
-  DatasetMetadata,
-  EvalDataset,
+  type DatasetMetadata,
+  type EvalDataset,
 } from '@reaatech/classifier-evals';
 
 /**
@@ -132,7 +132,7 @@ function parseCSV(content: string): ClassificationResult[] {
     const confidenceStr =
       confidenceValue !== undefined ? parseCSVField(confidenceValue) : undefined;
     const confidence =
-      confidenceStr !== undefined && confidenceStr !== '' ? parseFloat(confidenceStr) : 1.0;
+      confidenceStr !== undefined && confidenceStr !== '' ? Number.parseFloat(confidenceStr) : 1.0;
 
     if (!text || !label || !predictedLabel) {
       continue;
@@ -142,7 +142,7 @@ function parseCSV(content: string): ClassificationResult[] {
       text,
       label,
       predicted_label: predictedLabel,
-      confidence: isNaN(confidence) ? 1.0 : Math.max(0, Math.min(1, confidence)),
+      confidence: Number.isNaN(confidence) ? 1.0 : Math.max(0, Math.min(1, confidence)),
     });
   }
 
@@ -230,10 +230,7 @@ function parseJSONL(content: string): ClassificationResult[] {
         predicted_label: predictedLabel,
         confidence,
       });
-    } catch {
-      // Skip malformed lines
-      continue;
-    }
+    } catch {}
   }
 
   return results;

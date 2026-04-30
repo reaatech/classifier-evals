@@ -1,45 +1,45 @@
-import { describe, expect, it, vi } from 'vitest';
-import {
-  endSpan,
-  startEvalSpan,
-  startDatasetLoadSpan,
-  startMetricsSpan,
-  startJudgeSpan,
-  startGatesSpan,
-  withSpan,
-} from '../tracing.js';
-import {
-  setEvalRunId,
-  getEvalRunId,
-  logEvalStart,
-  logDatasetLoad,
-  logGateResult,
-  logJudgeCost,
-  logEvalComplete,
-  logWarn,
-  logError,
-} from '../logger.js';
-import {
-  initMetrics,
-  recordEvalRun,
-  recordSamplesEvaluated,
-  recordJudgeCall,
-  recordJudgeCost,
-  recordGateResult,
-  recordAccuracy,
-  recordF1Macro,
-  getMeter,
-  shutdownMetrics,
-} from '../telemetry.js';
+import * as fs from 'node:fs';
 import {
   generateGitHubOutput,
   generateJUnitXML,
   generatePRComment,
-  setGitHubOutput,
   isGitHubActions,
+  setGitHubOutput,
 } from '@reaatech/classifier-evals-gates';
-import * as fs from 'fs';
+import { describe, expect, it, vi } from 'vitest';
 import type { GateResult } from '../domain.js';
+import {
+  getEvalRunId,
+  logDatasetLoad,
+  logError,
+  logEvalComplete,
+  logEvalStart,
+  logGateResult,
+  logJudgeCost,
+  logWarn,
+  setEvalRunId,
+} from '../logger.js';
+import {
+  getMeter,
+  initMetrics,
+  recordAccuracy,
+  recordEvalRun,
+  recordF1Macro,
+  recordGateResult,
+  recordJudgeCall,
+  recordJudgeCost,
+  recordSamplesEvaluated,
+  shutdownMetrics,
+} from '../telemetry.js';
+import {
+  endSpan,
+  startDatasetLoadSpan,
+  startEvalSpan,
+  startGatesSpan,
+  startJudgeSpan,
+  startMetricsSpan,
+  withSpan,
+} from '../tracing.js';
 
 describe('observability and CI helpers', () => {
   it('records logs, spans, and metrics without throwing', async () => {
@@ -154,15 +154,15 @@ describe('observability and CI helpers', () => {
     const origWarn = originalLogger.warn;
     const origError = originalLogger.error;
 
-    originalLogger.info = function () {
+    originalLogger.info = (() => {
       throw new Error('info fail');
-    } as (...args: unknown[]) => void;
-    originalLogger.warn = function () {
+    }) as (...args: unknown[]) => void;
+    originalLogger.warn = (() => {
       throw new Error('warn fail');
-    } as (...args: unknown[]) => void;
-    originalLogger.error = function () {
+    }) as (...args: unknown[]) => void;
+    originalLogger.error = (() => {
       throw new Error('error fail');
-    } as (...args: unknown[]) => void;
+    }) as (...args: unknown[]) => void;
 
     expect(() => logEvalStart('test.csv', 5)).not.toThrow();
     expect(() => logEvalComplete(0.9, 0.8)).not.toThrow();

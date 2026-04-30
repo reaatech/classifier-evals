@@ -2,9 +2,9 @@
  * Gate utility functions extracted from eval-run helpers.
  */
 
-import { readFileSync } from 'fs';
-import YAML from 'yaml';
+import { readFileSync } from 'node:fs';
 import type { RegressionGate } from '@reaatech/classifier-evals';
+import YAML from 'yaml';
 
 export function normalizeRegressionGate(gate: Record<string, unknown>): RegressionGate {
   return {

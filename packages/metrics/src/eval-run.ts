@@ -1,8 +1,13 @@
-import { randomUUID } from 'crypto';
-import path from 'path';
-import { buildConfusionMatrix } from './confusion-matrix.js';
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import type {
+  ClassificationResult,
+  EvalRun,
+  GateResult,
+  JudgedResult,
+} from '@reaatech/classifier-evals';
 import { calculateAllMetrics } from './classification-metrics.js';
-import type { ClassificationResult, EvalRun, JudgedResult, GateResult } from '@reaatech/classifier-evals';
+import { buildConfusionMatrix } from './confusion-matrix.js';
 
 export interface EvalRunBuildOptions {
   datasetPath?: string;
@@ -16,7 +21,9 @@ export interface EvalRunBuildOptions {
   metadata?: Record<string, unknown>;
 }
 
-export function buildDistributionMetadata(samples: ClassificationResult[]): Record<string, unknown> {
+export function buildDistributionMetadata(
+  samples: ClassificationResult[],
+): Record<string, unknown> {
   const labelDistribution: Record<string, number> = {};
   const predictionDistribution: Record<string, number> = {};
 

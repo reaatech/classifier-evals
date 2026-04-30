@@ -1,9 +1,13 @@
+import type { Counter, Gauge, Histogram, Meter } from '@opentelemetry/api';
+import type { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 /**
  * OpenTelemetry metrics for classifier-evals
  */
-import { MeterProvider, PeriodicExportingMetricReader, type MetricReader } from '@opentelemetry/sdk-metrics';
-import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { type Counter, type Histogram, type Gauge, type Meter } from '@opentelemetry/api';
+import {
+  MeterProvider,
+  type MetricReader,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 
 const METER_NAME = 'classifier-evals';
 

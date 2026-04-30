@@ -1,7 +1,7 @@
 /**
  * OpenTelemetry tracing for classifier-evals
  */
-import { trace, SpanStatusCode, type Span } from '@opentelemetry/api';
+import { type Span, SpanStatusCode, trace } from '@opentelemetry/api';
 
 const TRACER_NAME = 'classifier-evals';
 

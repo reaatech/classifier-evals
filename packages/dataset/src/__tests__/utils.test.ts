@@ -1,3 +1,4 @@
+import type { EvalDataset } from '@reaatech/classifier-evals';
 import { describe, expect, it } from 'vitest';
 import {
   applyLabelAliases,
@@ -11,12 +12,7 @@ import {
   normalizeLabels,
 } from '../label-manager.js';
 import { kFoldSplit, kFoldSplits, splitDataset } from '../splitter.js';
-import {
-  getDatasetSummary,
-  validateDataset,
-  validateSamples,
-} from '../validator.js';
-import type { EvalDataset } from '@reaatech/classifier-evals';
+import { getDatasetSummary, validateDataset, validateSamples } from '../validator.js';
 
 function createDataset(): EvalDataset {
   return {
@@ -222,7 +218,7 @@ describe('dataset utilities', () => {
     const dataset = createDataset();
     const aliased = applyLabelAliases(dataset, {});
     expect(aliased.metadata.labels).toBeDefined();
-    expect(aliased.metadata.labels!.length).toBeGreaterThan(0);
+    expect(aliased.metadata.labels?.length).toBeGreaterThan(0);
   });
 
   it('normalizeLabels recomputes metadata', () => {

@@ -4,8 +4,8 @@
  * identifies systematic biases, and exports results for analysis
  */
 
-import { ClassificationResult, JudgedResult, CostAccount } from '@reaatech/classifier-evals';
-import { ConsensusResult } from './consensus-voting.js';
+import type { ClassificationResult, CostAccount, JudgedResult } from '@reaatech/classifier-evals';
+import type { ConsensusResult } from './consensus-voting.js';
 
 /**
  * Aggregated results from judge evaluation

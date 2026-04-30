@@ -3,7 +3,7 @@
  * Handles label normalization, aliasing, unknown label handling, and hierarchy
  */
 
-import { ClassificationResult, EvalDataset } from '@reaatech/classifier-evals';
+import type { ClassificationResult, EvalDataset } from '@reaatech/classifier-evals';
 
 /**
  * Label alias mapping (synonym -> canonical label)
@@ -211,7 +211,7 @@ export function isLeafLabel(label: string, hierarchy: LabelHierarchy): boolean {
 /**
  * Get all labels at a specific level in the hierarchy
  */
-export function getLabelsAtLevel(hierarchy: LabelHierarchy, level: number = 0): string[] {
+export function getLabelsAtLevel(hierarchy: LabelHierarchy, level = 0): string[] {
   if (level === 0) {
     // Root level - labels that are not children of any other label
     const allChildren = new Set(Object.values(hierarchy).flat());
@@ -248,7 +248,7 @@ export function getLabelsAtLevel(hierarchy: LabelHierarchy, level: number = 0): 
 export function computeHierarchicalMetrics(
   dataset: EvalDataset,
   hierarchy: LabelHierarchy,
-  level: number = 0,
+  level = 0,
 ): { total: number; correct: number; accuracy: number } {
   const labelsAtLevel = getLabelsAtLevel(hierarchy, level);
   const labelSet = new Set(labelsAtLevel);

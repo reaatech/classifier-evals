@@ -1,15 +1,15 @@
 /**
  * compare_models MCP tool implementation
  */
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import {
-  comparePersistedEvalRuns,
-  compareModels,
-  summarizeComparison,
-} from '@reaatech/classifier-evals-metrics';
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { logger } from '@reaatech/classifier-evals';
 import type { ClassificationResult, EvalRun } from '@reaatech/classifier-evals';
 import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
+import {
+  compareModels,
+  comparePersistedEvalRuns,
+  summarizeComparison,
+} from '@reaatech/classifier-evals-metrics';
 
 export async function compareModelsTool(args: Record<string, unknown>): Promise<CallToolResult> {
   const baselineResultsArg = args.baseline_results ?? args.baseline_predictions;

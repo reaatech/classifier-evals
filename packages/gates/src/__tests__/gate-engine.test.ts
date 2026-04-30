@@ -2,22 +2,22 @@
  * Unit tests for regression gate engine
  */
 
-import { describe, it, expect } from 'vitest';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import { createGateEngine } from '../gate-engine.js';
-import { evaluateThresholdGate } from '../threshold-gates.js';
-import { evaluateDistributionGate } from '../distribution-gates.js';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import type { ClassificationMetrics, RegressionGate } from '@reaatech/classifier-evals';
+import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
+import { describe, expect, it } from 'vitest';
 import { evaluateBaselineComparison } from '../baseline-comparison.js';
+import { evaluateDistributionGate } from '../distribution-gates.js';
+import { createGateEngine } from '../gate-engine.js';
 import {
+  type GateEvaluationContext,
   compareThreshold,
   formatMetricValue,
   getMetricValue,
-  GateEvaluationContext,
 } from '../metric-lookup.js';
-import { ClassificationMetrics, RegressionGate } from '@reaatech/classifier-evals';
-import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
+import { evaluateThresholdGate } from '../threshold-gates.js';
 
 function createMockMetrics(overrides: Partial<ClassificationMetrics> = {}): ClassificationMetrics {
   return {

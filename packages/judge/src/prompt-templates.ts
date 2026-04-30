@@ -2,7 +2,11 @@
  * Prompt templates for LLM-as-judge
  */
 
-import { ClassificationResult, redactPII, sanitizeForPrompt } from '@reaatech/classifier-evals';
+import {
+  type ClassificationResult,
+  redactPII,
+  sanitizeForPrompt,
+} from '@reaatech/classifier-evals';
 
 function safeText(text: string): string {
   return sanitizeForPrompt(redactPII(text));

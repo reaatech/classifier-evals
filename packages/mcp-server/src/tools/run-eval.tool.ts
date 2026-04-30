@@ -1,10 +1,10 @@
 /**
  * run_eval MCP tool implementation
  */
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { loadDataset } from '@reaatech/classifier-evals-dataset';
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { logger } from '@reaatech/classifier-evals';
 import type { ClassificationResult } from '@reaatech/classifier-evals';
+import { loadDataset } from '@reaatech/classifier-evals-dataset';
 import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
 
 export async function runEvalTool(args: Record<string, unknown>): Promise<CallToolResult> {

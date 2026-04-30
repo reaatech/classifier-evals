@@ -1,14 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
-import {
-  exportToJson,
-  exportToHtml,
-  exportToPhoenix,
-  exportToLangfuse,
-  type JsonExportInput,
-  type PhoenixExportInput,
-  type LangfuseExportInput,
-} from '../index.js';
 import type { EvalRun } from '@reaatech/classifier-evals';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  type JsonExportInput,
+  type LangfuseExportInput,
+  type PhoenixExportInput,
+  exportToHtml,
+  exportToJson,
+  exportToLangfuse,
+  exportToPhoenix,
+} from '../index.js';
 
 // Helper to create a minimal valid EvalRun
 function createMinimalEvalRun(overrides?: Partial<EvalRun>): EvalRun {
@@ -393,7 +393,7 @@ describe('Exporters', () => {
       expect(result.success).toBe(true);
       expect(mockFetch).toHaveBeenCalled();
       const fetchCall = mockFetch.mock.calls[0]!;
-      const body = JSON.parse(fetchCall[1]!.body as string);
+      const body = JSON.parse(fetchCall[1]?.body as string);
       expect(body.batch[0].body.name).toBe('custom-trace');
       expect(body.batch[0].body.sessionId).toBe('session-123');
 

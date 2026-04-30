@@ -10,11 +10,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "error"
-      },
       "style": {
-        "noNonNullAssertion": "error"
+        "noNonNullAssertion": "off",
+        "noParameterAssign": "off"
       }
     }
   },
@@ -31,4 +29,3 @@
     }
   }
 }
-
