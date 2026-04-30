@@ -39,6 +39,7 @@ jobs:
       - name: Check regression gates
         run: |
           cd packages/cli
+          cp ../../results/latest.json ../../results/baseline.json
           node dist/cli.js gates \
             --results ../../results/latest.json \
             --gates ../../datasets/examples/gates.yaml
