@@ -5,7 +5,7 @@
   "description": "Enterprise-grade classifier evaluation suite for intent classification systems with confusion matrices, LLM-as-judge, regression gates, and Phoenix/Langfuse exporters",
   "type": "module",
   "scripts": {
-    "build": "turbo run build",
+    "build": "pnpm install && turbo run build",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
