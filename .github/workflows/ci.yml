@@ -46,6 +46,7 @@ jobs:
   audit:
     name: Security Audit
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,6 +60,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Restore dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.local/share/pnpm/store
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -232,7 +242,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-dist
 
@@ -270,7 +280,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-dist
 
