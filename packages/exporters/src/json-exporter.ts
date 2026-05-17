@@ -2,9 +2,8 @@
  * JSON Exporter - Machine-readable export format
  */
 
-import { logger } from '@reaatech/classifier-evals';
 import type { EvalRun, ExportResult } from '@reaatech/classifier-evals';
-import { redactObjectPII } from '@reaatech/classifier-evals';
+import { logger, redactObjectPII } from '@reaatech/classifier-evals';
 
 export interface JsonExportOptions {
   /** Include raw sample data (default: false for PII safety) */

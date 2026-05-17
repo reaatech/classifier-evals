@@ -2,8 +2,8 @@
  * run_eval MCP tool implementation
  */
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { logger } from '@reaatech/classifier-evals';
 import type { ClassificationResult } from '@reaatech/classifier-evals';
+import { logger } from '@reaatech/classifier-evals';
 import { loadDataset } from '@reaatech/classifier-evals-dataset';
 import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
 

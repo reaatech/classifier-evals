@@ -6,7 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { ClassificationResult, JudgedResult } from '@reaatech/classifier-evals';
 import OpenAI from 'openai';
 import { type BudgetConfig, type CostTracker, createCostTracker } from './cost-tracker.js';
-import { type PromptTemplateType, formatPrompt, getPromptTemplate } from './prompt-templates.js';
+import { formatPrompt, getPromptTemplate, type PromptTemplateType } from './prompt-templates.js';
 
 /**
  * Result from LLM judge evaluation

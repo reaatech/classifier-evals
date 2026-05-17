@@ -4,8 +4,11 @@
 
 import * as fs from 'node:fs';
 import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
-import { type GateEvaluationResult, createGateEngine } from '@reaatech/classifier-evals-gates';
-import { loadRegressionGatesFromFile } from '@reaatech/classifier-evals-gates';
+import {
+  createGateEngine,
+  type GateEvaluationResult,
+  loadRegressionGatesFromFile,
+} from '@reaatech/classifier-evals-gates';
 import type { Command } from 'commander';
 
 interface GatesCommandOptions {

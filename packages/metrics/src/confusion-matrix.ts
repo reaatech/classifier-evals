@@ -41,7 +41,7 @@ export function buildConfusionMatrix(samples: ClassificationResult[]): Confusion
 
   // Calculate per-class metrics
   const perClass = labels.map((label, i) => {
-    const tp = matrix[i]?.[i]!; // True positives
+    const tp = matrix[i]?.[i] ?? 0; // True positives
     const fn = matrix[i]?.reduce((sum, val, j) => sum + (j !== i ? val : 0), 0); // False negatives (row minus diagonal)
     const fp = matrix.reduce((sum, row, j) => sum + (j !== i ? row[i]! : 0), 0); // False positives (column minus diagonal)
     const tn = samples.length - tp - fp - fn; // True negatives
@@ -192,7 +192,7 @@ export function getErrorRates(cm: ConfusionMatrix): Record<string, number> {
   for (let i = 0; i < cm.labels.length; i++) {
     const label = cm.labels[i]!;
     const total = cm.matrix[i]?.reduce((sum, v) => sum + v, 0);
-    const errors = total - cm.matrix[i]?.[i]!;
+    const errors = total - (cm.matrix[i]?.[i] ?? 0);
     errorRates[label] = total > 0 ? errors / total : 0;
   }
 
@@ -211,11 +211,11 @@ export function getTopMisclassifications(
 
   for (let i = 0; i < cm.labels.length; i++) {
     for (let j = 0; j < cm.labels.length; j++) {
-      if (i !== j && cm.matrix[i]?.[j]! > 0) {
+      if (i !== j && (cm.matrix[i]?.[j] ?? 0) > 0) {
         misclassifications.push({
           trueLabel: cm.labels[i]!,
           predictedLabel: cm.labels[j]!,
-          count: cm.matrix[i]?.[j]!,
+          count: cm.matrix[i]?.[j] ?? 0,
         });
       }
     }

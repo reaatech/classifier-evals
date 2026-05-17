@@ -3,48 +3,45 @@
  */
 
 export {
-  JudgeEngine,
+  analyzeDisagreements,
+  type ConsensusConfig,
+  type ConsensusResult,
+  executeBatchConsensusVoting,
+  executeConsensusVoting,
+  type JudgeVote,
+  optimizeJudgeCount,
+} from './consensus-voting.js';
+export {
+  type BudgetConfig,
+  type CostBreakdown,
+  CostTracker,
+  createCostTracker,
+  type ModelPricing,
+} from './cost-tracker.js';
+export {
   createJudgeEngine,
+  type JudgeAggregateResult,
+  JudgeEngine,
   type JudgeEngineConfig,
   type LLMJudgeResult,
   type SampleJudgeResult,
-  type JudgeAggregateResult,
 } from './judge-engine.js';
-
 export {
-  getPromptTemplate,
   formatPrompt,
-  registerCustomTemplate,
-  type PromptTemplateType,
+  getPromptTemplate,
   type PromptTemplate,
+  type PromptTemplateType,
+  registerCustomTemplate,
 } from './prompt-templates.js';
 
 export {
-  CostTracker,
-  createCostTracker,
-  type BudgetConfig,
-  type CostBreakdown,
-  type ModelPricing,
-} from './cost-tracker.js';
-
-export {
-  executeConsensusVoting,
-  executeBatchConsensusVoting,
-  analyzeDisagreements,
-  optimizeJudgeCount,
-  type JudgeVote,
-  type ConsensusResult,
-  type ConsensusConfig,
-} from './consensus-voting.js';
-
-export {
-  aggregateJudgeResults,
+  type AggregatorConfig,
   aggregateConsensusResults,
+  aggregateJudgeResults,
+  type ClassBreakdown,
+  type DisagreementAnalysis,
   exportJudgeResults,
   generateJudgeSummaryReport,
   type JudgeAggregateResults,
-  type ClassBreakdown,
   type SystematicBias,
-  type DisagreementAnalysis,
-  type AggregatorConfig,
 } from './result-aggregator.js';

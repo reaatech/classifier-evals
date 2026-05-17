@@ -3,9 +3,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { logger } from '@reaatech/classifier-evals';
 import type { EvalRun, ExportResult } from '@reaatech/classifier-evals';
-import { redactObjectPII } from '@reaatech/classifier-evals';
+import { logger, redactObjectPII } from '@reaatech/classifier-evals';
 
 export interface PhoenixExportOptions {
   /** Phoenix endpoint URL */

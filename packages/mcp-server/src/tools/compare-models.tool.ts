@@ -2,9 +2,8 @@
  * compare_models MCP tool implementation
  */
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { logger } from '@reaatech/classifier-evals';
 import type { ClassificationResult, EvalRun } from '@reaatech/classifier-evals';
-import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
+import { loadEvalRunFromFile, logger } from '@reaatech/classifier-evals';
 import {
   compareModels,
   comparePersistedEvalRuns,

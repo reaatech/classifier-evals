@@ -4,10 +4,12 @@
 
 import * as fs from 'node:fs';
 import type { EvalRun } from '@reaatech/classifier-evals';
-import { exportToJson } from '@reaatech/classifier-evals-exporters';
-import { exportToHtml } from '@reaatech/classifier-evals-exporters';
-import { exportToLangfuse } from '@reaatech/classifier-evals-exporters';
-import { exportToPhoenix } from '@reaatech/classifier-evals-exporters';
+import {
+  exportToHtml,
+  exportToJson,
+  exportToLangfuse,
+  exportToPhoenix,
+} from '@reaatech/classifier-evals-exporters';
 import type { Command } from 'commander';
 
 interface ReportCommandOptions {

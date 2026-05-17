@@ -4,7 +4,6 @@
 
 import { describe, expect, it } from 'vitest';
 import {
-  type TrendDataPoint,
   calculateTrendStatistics,
   compareEvalRuns,
   evalRunToTrendDataPoint,
@@ -14,6 +13,7 @@ import {
   filterByModel,
   generateDashboardReport,
   generateDashboardSummary,
+  type TrendDataPoint,
 } from '../dashboard.js';
 import type { EvalRun } from '../domain.js';
 

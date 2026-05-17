@@ -4,9 +4,9 @@
 
 import type { ClassificationMetrics, GateResult, RegressionGate } from '@reaatech/classifier-evals';
 import {
-  type GateEvaluationContext,
   compareThreshold,
   formatMetricValue,
+  type GateEvaluationContext,
   getMetricValue,
 } from './metric-lookup.js';
 
