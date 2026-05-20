@@ -2,11 +2,10 @@
  * check_gates MCP tool implementation
  */
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { logger } from '@reaatech/classifier-evals';
 import type { EvalRun, RegressionGate } from '@reaatech/classifier-evals';
-import { loadEvalRunFromFile } from '@reaatech/classifier-evals';
-import { GateEngine } from '@reaatech/classifier-evals-gates';
+import { loadEvalRunFromFile, logger } from '@reaatech/classifier-evals';
 import {
+  GateEngine,
   loadRegressionGatesFromFile,
   normalizeRegressionGate,
 } from '@reaatech/classifier-evals-gates';

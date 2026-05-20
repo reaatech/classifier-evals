@@ -5,11 +5,11 @@
 import type { ClassificationResult } from '@reaatech/classifier-evals';
 import { describe, expect, it } from 'vitest';
 import {
-  type ConsensusConfig,
-  type JudgeVote,
   analyzeDisagreements,
+  type ConsensusConfig,
   executeBatchConsensusVoting,
   executeConsensusVoting,
+  type JudgeVote,
   optimizeJudgeCount,
 } from '../consensus-voting.js';
 

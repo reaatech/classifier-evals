@@ -4,8 +4,7 @@
 
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { ClassificationResult } from '@reaatech/classifier-evals';
-import { executeBatchConsensusVoting } from '@reaatech/classifier-evals-judge';
-import { createJudgeEngine } from '@reaatech/classifier-evals-judge';
+import { createJudgeEngine, executeBatchConsensusVoting } from '@reaatech/classifier-evals-judge';
 
 export async function llmJudgeTool(args: Record<string, unknown>): Promise<CallToolResult> {
   const samples = args.samples as ClassificationResult[] | undefined;

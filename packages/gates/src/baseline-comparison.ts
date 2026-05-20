@@ -3,12 +3,16 @@
  */
 
 import { readFileSync } from 'node:fs';
-import type { ClassificationMetrics, GateResult, RegressionGate } from '@reaatech/classifier-evals';
-import type { EvalRun } from '@reaatech/classifier-evals';
+import type {
+  ClassificationMetrics,
+  EvalRun,
+  GateResult,
+  RegressionGate,
+} from '@reaatech/classifier-evals';
 import {
-  type GateEvaluationContext,
   compareThreshold,
   formatMetricValue,
+  type GateEvaluationContext,
   getMetricValue,
 } from './metric-lookup.js';
 

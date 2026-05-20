@@ -5,9 +5,11 @@ import { performance } from 'node:perf_hooks';
 import type { ClassificationResult, RegressionGate } from '@reaatech/classifier-evals';
 import { loadDataset } from '@reaatech/classifier-evals-dataset';
 import { createGateEngine } from '@reaatech/classifier-evals-gates';
-import { buildConfusionMatrix } from '@reaatech/classifier-evals-metrics';
-import { calculateAllMetrics } from '@reaatech/classifier-evals-metrics';
-import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
+import {
+  buildConfusionMatrix,
+  calculateAllMetrics,
+  createEvalRunFromSamples,
+} from '@reaatech/classifier-evals-metrics';
 import { afterEach, describe, expect, it } from 'vitest';
 
 const tempDirs: string[] = [];

@@ -12,9 +12,9 @@ import { evaluateBaselineComparison } from '../baseline-comparison.js';
 import { evaluateDistributionGate } from '../distribution-gates.js';
 import { createGateEngine } from '../gate-engine.js';
 import {
-  type GateEvaluationContext,
   compareThreshold,
   formatMetricValue,
+  type GateEvaluationContext,
   getMetricValue,
 } from '../metric-lookup.js';
 import { evaluateThresholdGate } from '../threshold-gates.js';

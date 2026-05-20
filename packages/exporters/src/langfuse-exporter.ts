@@ -3,8 +3,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { logger } from '@reaatech/classifier-evals';
 import type { EvalRun, ExportResult } from '@reaatech/classifier-evals';
+import { logger } from '@reaatech/classifier-evals';
 
 export interface LangfuseExportOptions {
   /** Langfuse public key */

@@ -5,9 +5,8 @@
 import { writeFileSync } from 'node:fs';
 import type { ClassificationResult } from '@reaatech/classifier-evals';
 import { loadDataset } from '@reaatech/classifier-evals-dataset';
-import { createJudgeEngine } from '@reaatech/classifier-evals-judge';
-import { executeBatchConsensusVoting } from '@reaatech/classifier-evals-judge';
 import type { JudgeAggregateResult, JudgeEngine } from '@reaatech/classifier-evals-judge';
+import { createJudgeEngine, executeBatchConsensusVoting } from '@reaatech/classifier-evals-judge';
 import { createEvalRunFromSamples } from '@reaatech/classifier-evals-metrics';
 import type { Command } from 'commander';
 

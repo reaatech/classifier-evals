@@ -1,6 +1,6 @@
-import { calculateMetricsFromCM } from '@reaatech/classifier-evals-metrics';
-import { buildConfusionMatrix } from '@reaatech/classifier-evals-metrics';
 import {
+  buildConfusionMatrix,
+  calculateMetricsFromCM,
   generateHeatmapData,
   generateMetricsBarChart,
   generatePRCurveData,

@@ -2,8 +2,8 @@
  * HTML Exporter - Interactive HTML report generation
  */
 
-import { logger } from '@reaatech/classifier-evals';
 import type { EvalRun } from '@reaatech/classifier-evals';
+import { logger } from '@reaatech/classifier-evals';
 
 export interface HtmlExportOptions {
   includeConfusionMatrix?: boolean;

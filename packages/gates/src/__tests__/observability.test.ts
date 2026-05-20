@@ -1,7 +1,10 @@
 import * as fs from 'node:fs';
 import type { GateResult } from '@reaatech/classifier-evals';
 import {
+  endSpan,
   getEvalRunId,
+  getMeter,
+  initMetrics,
   logDatasetLoad,
   logError,
   logEvalComplete,
@@ -9,11 +12,6 @@ import {
   logGateResult,
   logJudgeCost,
   logWarn,
-  setEvalRunId,
-} from '@reaatech/classifier-evals';
-import {
-  getMeter,
-  initMetrics,
   recordAccuracy,
   recordEvalRun,
   recordF1Macro,
@@ -21,10 +19,8 @@ import {
   recordJudgeCall,
   recordJudgeCost,
   recordSamplesEvaluated,
+  setEvalRunId,
   shutdownMetrics,
-} from '@reaatech/classifier-evals';
-import {
-  endSpan,
   startDatasetLoadSpan,
   startEvalSpan,
   startGatesSpan,
