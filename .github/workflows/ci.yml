@@ -242,7 +242,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: build-dist
 
@@ -280,7 +280,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: build-dist
 
