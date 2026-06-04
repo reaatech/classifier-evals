@@ -1,6 +1,6 @@
 {
   "name": "@reaatech/classifier-evals-exporters",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Exporters for classifier evaluation results (JSON, HTML, Phoenix, Langfuse)",
   "license": "MIT",
   "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",

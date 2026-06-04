@@ -1,6 +1,6 @@
 {
   "name": "@reaatech/classifier-evals-gates",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Regression quality gates for CI-integrated classifier evaluation",
   "license": "MIT",
   "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
