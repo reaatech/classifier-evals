@@ -46,7 +46,7 @@
     "@reaatech/classifier-evals-gates": "workspace:*",
     "@reaatech/classifier-evals-judge": "workspace:*",
     "@reaatech/classifier-evals-metrics": "workspace:*",
-    "commander": "^14.0.0"
+    "commander": "^15.0.0"
   },
   "devDependencies": {
     "tsup": "^8.4.0",
