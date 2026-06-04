@@ -1,6 +1,6 @@
 {
   "name": "@reaatech/classifier-evals-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server exposing classifier evaluation tools",
   "license": "MIT",
   "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",

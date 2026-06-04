@@ -1,6 +1,6 @@
 {
   "name": "@reaatech/classifier-evals-judge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "LLM-as-judge for classifier evaluation with cost tracking",
   "license": "MIT",
   "author": "Rick Somers <rick@reaatech.com> (https://reaatech.com)",
