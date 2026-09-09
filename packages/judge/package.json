@@ -39,7 +39,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "@reaatech/classifier-evals": "workspace:*",
-    "openai": "^6.35.0"
+    "openai": "^7.10.0"
   },
   "devDependencies": {
     "@reaatech/classifier-evals-metrics": "workspace:*",
