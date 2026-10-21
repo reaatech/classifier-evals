@@ -41,7 +41,7 @@
     "@reaatech/classifier-evals-metrics": "workspace:*"
   },
   "devDependencies": {
-    "tsup": "^8.4.0",
+    "tsup": "^9.0.0",
     "typescript": "^5.8.3",
     "vitest": "^4.1.8"
   }
